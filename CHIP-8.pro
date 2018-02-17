@@ -7,4 +7,4 @@ SOURCES += main.cpp \
     Chip8.cpp
 
 HEADERS += \
-    Chip8.h
+    Chip8.hpp
