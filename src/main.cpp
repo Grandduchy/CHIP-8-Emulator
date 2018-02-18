@@ -1,7 +1,7 @@
 
-#include <Chip8.h>
-
 #include <iostream>
+
+#include "Chip8.hpp"
 
 int main(){
 

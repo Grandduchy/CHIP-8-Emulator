@@ -3,6 +3,7 @@
 
 #include <array>
 #include <string>
+#include <random>
 #include <fstream>
 #include <stdint.h>
 
@@ -38,9 +39,10 @@ private:
     // When the counter is incremented, it points to the next instruction.
     uint16_t programCounter;
     // Register to store memory addresses (called I) for later use
+    // A special kind of register for memory addresses
     uint16_t indexRegister;
     // Screen is 64 by 32, where each are a pixel.
-    // Graphics are black and white 0 -> white 1-> black
+    // Graphics are black and white, 0 -> white 1 -> black
     std::array<uint8_t, 64 * 32> pixels{};
     // Timers count at 60 Hz until they reach 0
 
@@ -79,7 +81,9 @@ private:
       0xF0, 0x80, 0xF0, 0x80, 0x80  // F
     };
 
+    void updateTimers() noexcept;
 
+    uint8_t getRand8Bit();
 };
 
 

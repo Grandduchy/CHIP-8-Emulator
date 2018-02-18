@@ -3,8 +3,12 @@ CONFIG += console c++11
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp \
-    Chip8.cpp
+SOURCES += \
+    src/Chip8.cpp \
+    src/main.cpp
 
 HEADERS += \
-    Chip8.hpp
+    include/Chip8.hpp
+
+
+INCLUDEPATH += -I /home/joshua/Development/Git/CHIP-8/include
