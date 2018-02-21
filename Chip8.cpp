@@ -5,6 +5,11 @@
 
 #include "Chip8.hpp"
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> 96d294282662aea3e637acfaa3e409e3b6854139
 Chip8::Chip8() {
     initalize();
 }
@@ -197,6 +202,7 @@ void Chip8::emulateCycle() {
             std::cerr << "Unkown opcode, expected 0x9XY0 recieved : " << opcode << "\n";
         }
         break;
+<<<<<<< HEAD
     case 0xA000: // ANN : set I to NNN
         indexRegister = opcode & 0x0FFF;
         programCounter += 2;
@@ -229,10 +235,26 @@ void Chip8::emulateCycle() {
             default :
             std::cerr << "Unkown opcode, expected 0xEX(9E, A1) recieved : " << opcode << "\n";
         }
+=======
+    case 0xA000:
+
+        break;
+    case 0xB000:
+
+        break;
+    case 0xC000:
+
+        break;
+    case 0xD000:
+
+        break;
+    case 0xE000:
+>>>>>>> 96d294282662aea3e637acfaa3e409e3b6854139
 
         break;
     case 0xF000:
         switch(opcode & 0x00FF) {
+<<<<<<< HEAD
             case 0x0007 : // FX07 : Set VX to the delay timer
                 registers[(opcode & 0x0F00) >> 8] = delayTimer;
                 programCounter += 2;
@@ -261,6 +283,19 @@ void Chip8::emulateCycle() {
                 break;
             case 0x0029 : // FX29 : Set I to the sprite location for a character to VX
                 // TODO
+=======
+            case 0x0007 :
+                break;
+            case 0x000A :
+                break;
+            case 0x0015 :
+                break;
+            case 0x0018 :
+                break;
+            case 0x001E :
+                break;
+            case 0x0029 :
+>>>>>>> 96d294282662aea3e637acfaa3e409e3b6854139
                 break;
             case 0x0033 :
                 memory[indexRegister] = registers[(opcode & 0x0F00) >> 8] / 100;
@@ -268,6 +303,7 @@ void Chip8::emulateCycle() {
                 memory[indexRegister + 2] = (registers[(opcode & 0x0F00) >> 8] % 100) % 10;
                 programCounter += 2;
                 break;
+<<<<<<< HEAD
             case 0x0055 : { // FX55 : Write registers into memory starting from V0 to (including) VX starting at I, I is incremented by 1.
                 auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1; // <- Note to check this, +1 may not be needed.
                 for (auto it = registers.cbegin(); it != endRegister; it++) {
@@ -286,6 +322,12 @@ void Chip8::emulateCycle() {
                 programCounter += 2;
                 break;
             }
+=======
+            case 0x0055 :
+                break;
+            case 0x0065 :
+                break;
+>>>>>>> 96d294282662aea3e637acfaa3e409e3b6854139
             default :
                 std::cerr << "Unkown opcode, expected 0xFN(07,0A,15,18,1E,29,33,55,65) recieved : " << opcode << "\n";
         }
@@ -297,12 +339,18 @@ void Chip8::emulateCycle() {
     }
     updateTimers();
 
+<<<<<<< HEAD
     std::cerr << std::dec << std::flush;
 }
 
 
 bool isHalted() const noexcept;
 
+=======
+    std::cerr << std::dec;
+}
+
+>>>>>>> 96d294282662aea3e637acfaa3e409e3b6854139
 void Chip8::updateTimers() noexcept {
     if (delayTimer > 0)
         --delayTimer;
