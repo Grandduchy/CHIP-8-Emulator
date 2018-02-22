@@ -27,7 +27,7 @@ void Chip8::initalize() {
 
     // load the fontset
     for (int i = 0; i < 80; i++)
-        memory[0x00 + i] = fontset[i];
+        memory[i] = fontset[i];
 }
 
 // load the game into memory
@@ -188,7 +188,7 @@ void Chip8::emulateCycle() {
 
         break;
     case 0x9000:
-        if (opcode & 0x000F != 0) { // 9XY0 : skip if VX != VY
+        if ((opcode & 0x000F) != 0) { // 9XY0 : skip if VX != VY
             uint8_t VX = registers[(opcode & 0x0F00) >> 8];
             uint8_t VY = registers[(opcode & 0x00F0) >> 4];
             programCounter += VX != VY ? 4 : 2;
@@ -202,7 +202,7 @@ void Chip8::emulateCycle() {
         programCounter += 2;
         break;
     case 0xB000: // BNNN : set/jump to V0 and NNN
-        programCounter = registers[0] + opcode& 0x0FFF;
+        programCounter = registers[0] + (opcode & 0x0FFF);
         break;
     case 0xC000: // CXNN : set VX to a random number Binary ANDed by NN, random number is unsigned 8 bits.
         registers[(opcode & 0x0F00) >> 8] = getRand8Bit() & (opcode & 0x00FF);
@@ -264,9 +264,20 @@ void Chip8::emulateCycle() {
                 programCounter += 2;
             }
                 break;
-            case 0x0029 : // FX29 : Set I to the sprite location for a character to VX
-                // TODO
+            case 0x0029 : {// FX29 : Set I to the sprite location for a character in VX
+                uint8_t character = registers[(0x0F00 & opcode) >> 8];
+                int intPos = static_cast<int>(character - '0');
+                int charPos = static_cast<int>(character - 'A');
+
+                if (intPos <= 9 && intPos >= 0) // the character is an integer
+                    indexRegister = intPos * 5;
+                else if (charPos <= 5 && charPos >= 0) // character is a character
+                    indexRegister = charPos * 5 + (5 * 10);
+                else
+                    std::cerr << "Character in VX is out of scope of the character set\n";
+                programCounter += 2;
                 break;
+            }
             case 0x0033 :
                 memory[indexRegister] = registers[(opcode & 0x0F00) >> 8] / 100;
                 memory[indexRegister + 1] = (registers[(opcode & 0x0F00) >> 8] / 10) % 10;
@@ -304,9 +315,6 @@ void Chip8::emulateCycle() {
 
     std::cerr << std::dec << std::flush;
 }
-
-
-bool isHalted() const noexcept;
 
 void Chip8::updateTimers() noexcept {
     if (delayTimer > 0)

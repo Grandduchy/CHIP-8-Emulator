@@ -4,8 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    Chip8.cpp \
-    main.cpp
+    Chip8.cpp
 
 HEADERS += \
     Chip8.hpp
