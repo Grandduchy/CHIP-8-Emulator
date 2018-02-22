@@ -62,6 +62,9 @@ private:
     // determines if the program requests to draw
     bool drawFlag = false;
 
+    // CHIP-8 Provides a fontset for programs to display 0-F characters called sprites
+    // The program needs to know where the binary representation of the sprite is located
+    // where the fontset will be loaded into memory( from 0x0000).
     uint8_t fontset[80] = {
       0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
       0x20, 0x60, 0x20, 0x20, 0x70, // 1

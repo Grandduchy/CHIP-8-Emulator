@@ -27,7 +27,7 @@ void Chip8::initalize() {
 
     // load the fontset
     for (int i = 0; i < 80; i++)
-        memory[0x50 + i] = fontset[i];
+        memory[0x00 + i] = fontset[i];
 }
 
 // load the game into memory
@@ -255,9 +255,14 @@ void Chip8::emulateCycle() {
                 soundTimer = registers[(opcode & 0x0F00) >> 8];
                 programCounter += 2;
                 break;
-            case 0x001E : // FX1E : adds VX to I
+            case 0x001E : {// FX1E : adds VX to I
+                if (indexRegister + registers[(opcode & 0x0F00) >> 8] > 0xFFF)
+                    registers[0xF] = 1;
+                else
+                    registers[0xF] = 0;
                 indexRegister += registers[(opcode & 0x0F00) >> 8];
                 programCounter += 2;
+            }
                 break;
             case 0x0029 : // FX29 : Set I to the sprite location for a character to VX
                 // TODO
