@@ -21,7 +21,9 @@ void Chip8::initalize() {
 
     std::fill(memory.begin(), memory.end(), 0);
     std::fill(registers.begin(), registers.end(), 0);
-    std::fill(pixels.begin(), pixels.end(), 0);
+    for (auto obj : this->pixels) {
+        std::fill(obj.begin(), obj.end(), 0);
+    }
     std::fill(stack.begin(), stack.end(), 0);
     std::fill(keys.begin(), keys.end(), 0);
 
@@ -60,7 +62,9 @@ void Chip8::emulateCycle() {
     case 0x0000:
         if ((opcode & 0xF000) == 0x00E0) { // 00E0 : clear screen
             std::cout << "Clear screen\n";
-            std::fill(pixels.begin(), pixels.end(), 0);
+            for (auto obj : pixels) {
+                std::fill(obj.begin(), obj.end(), 0);
+            }
             programCounter += 2;
         }
         else if ((opcode & 0xF000) == 0x00EE) { // 00EE : return from subroutine
@@ -208,8 +212,38 @@ void Chip8::emulateCycle() {
         registers[(opcode & 0x0F00) >> 8] = getRand8Bit() & (opcode & 0x00FF);
         programCounter += 2;
         break;
-    case 0xD000: {// DXYN : Draw sprite at VX, Vy
-        // TODO
+    case 0xD000: {// DXYN : Draw sprite at VX, Vy of N height starting at I.
+        uint8_t xPos = registers[(opcode & 0x0F00) >> 8];
+        uint8_t yPos = registers[(opcode & 0x00F0) >> 4];
+        uint8_t height = opcode & 0x000F;
+        uint8_t width = 8;
+
+        registers[0xF] = 0;
+
+        for (uint8_t y = 0; y != height; y++) {
+            // The I register points to the binary representation of the sprite
+            uint8_t binaryImage = memory[indexRegister + y];
+            // go through each bit
+            for (uint8_t x = 0; x != width; x++) {
+                uint8_t mask = 0x80 >> x; // start from greatest bit to least, 0x80 is the greatest bit in uint_8
+                bool isOn = binaryImage & mask;
+
+                // The pixel must wrap around if it goes out of scope
+                uint8_t pixelY = (yPos + y) % HEIGHT;
+                uint8_t, pixelX = (xPos + x) % WIDTH;
+
+                uint8_t& pixel = pixels[pixelY][pixelX];
+                if (isOn) {
+                    if (pixel == 1)
+                        registers[0xF] = 1;
+                    pixel ^= 1;
+                }
+
+            }
+
+        }
+        drawFlag = true;
+        programCounter += 2;
         break;
     }
     case 0xE000:

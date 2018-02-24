@@ -1,6 +1,9 @@
 #ifndef CHIP8
 #define CHIP8
 
+#define HEIGHT 32
+#define WIDTH 64
+
 #include <array>
 #include <string>
 #include <random>
@@ -43,7 +46,7 @@ private:
     uint16_t indexRegister;
     // Screen is 64 by 32, where each are a pixel.
     // Graphics are black and white, 0 -> white 1 -> black
-    std::array<uint8_t, 64 * 32> pixels{};
+    std::array<std::array<uint8_t, WIDTH>, HEIGHT> pixels{};
     // Timers count at 60 Hz until they reach 0
 
     // used for timing events
