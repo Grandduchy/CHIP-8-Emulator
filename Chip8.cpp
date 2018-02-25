@@ -99,23 +99,21 @@ void Chip8::emulateCycle() {
         break;
     }
     case 0x5000:
-        if ((opcode & 0x00F) != 0) { // 5XY0 : skip if VX == VY
-            uint8_t reg1 = registers.at((0x0F00 & opcode) >> 8);
-            uint8_t reg2 = registers.at((0x00F0 & opcode) >> 4);
-            programCounter += reg1 == reg2 ? 4 : 2;
+        if ((opcode & 0x000F) == 0) { // 5XY0 : skip if VX == VY
+            uint8_t VX = registers.at((0x0F00 & opcode) >> 8);
+            uint8_t VY = registers.at((0x00F0 & opcode) >> 4);
+            programCounter += VX == VY ? 4 : 2;
         }
         else {
-            std::cerr << "Invalid Opcode expected 0x5XY0 instead recieved : " << opcode << "\n";
+            std::cerr << "Invalid opcode expected 0x5XY0 instead recieved : " << opcode << "\n";
         }
         break;
     case 0x6000: // 6XNN : set VX to NN
-        std::cout << ((opcode & 0x0F00) >> 2) << "\n" << registers[80] << "\n";
-
-        registers.at((opcode & 0x0F00) >> 2) = opcode & 0x00FF;
+        registers.at((opcode & 0x0F00) >> 8) = opcode & 0x00FF;
         programCounter += 2;
         break;
     case 0x7000: // 7XNN : adds NN to VX
-        registers.at((opcode & 0x0F00) >> 2) += (opcode & 0x00FF);
+        registers.at((opcode & 0x0F00) >> 8) += (opcode & 0x00FF);
         programCounter += 2;
         break;
     case 0x8000:
@@ -146,17 +144,18 @@ void Chip8::emulateCycle() {
             }
             case 0x0005 :  {// 8XY5 : subtract VY from VX and set to VX
                 int16_t sum = registers.at((opcode & 0x0F00) >> 8) - registers.at((opcode & 0x00F0) >> 4);
+                std::get<0xF>(registers) = 1;
                 if (sum <= -1) { // we need to borrow from VF
                     if (std::get<0xF>(registers) == 1) {// Can borrow
                         std::get<0xF>(registers) = 0;
                         registers.at((opcode & 0x0F00) >> 8) = sum + std::numeric_limits<uint8_t>::max();
                     }
                     else { // Can't borrow
-                        std::get<0xF>(registers) = 1;
                         registers.at((opcode & 0x0F00) >> 8) = sum;
                     }
                 }
                 else {
+
                     registers.at((opcode & 0x0F00) >> 8) = sum;
                 }
                 programCounter += 2;
@@ -164,18 +163,18 @@ void Chip8::emulateCycle() {
             }
             case 0x0006 : // 8XY6 : right shift VY by one and store in VX
                 std::get<0xF>(registers) = registers.at((opcode & 0x00F0) >> 4) & 1; // store the least significant bit of VY in VF
-                registers.at((opcode& 0x0F00) >> 8) = (registers.at((opcode & 0x00F0) >> 4 ) >> 1);
+                registers.at((opcode & 0x0F00) >> 8) = registers.at((opcode & 0x00F0) >> 4 ) >> 1;
                 programCounter +=2;
                 break;
             case 0x0007 : {// 8XY7 : subtract VX from VY and set to VX
-                int16_t sum = registers[(opcode & 0x00F0) >> 4] - registers[(opcode & 0x0F00) >> 8];
+                int16_t sum = registers.at((opcode & 0x00F0) >> 4) - registers.at((opcode & 0x0F00) >> 8);
+                std::get<0xF>(registers) = 1;
                 if (sum <= -1) {
                     if (std::get<0xF>(registers) == 1) {
                         std::get<0xF>(registers) = 0;
                         registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum + std::numeric_limits<uint8_t>::max();
                     }
                     else {
-                        std::get<0xF>(registers) = 1;
                         registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum;
                     }
                 }
@@ -197,7 +196,7 @@ void Chip8::emulateCycle() {
 
         break;
     case 0x9000:
-        if ((opcode & 0x000F) != 0) { // 9XY0 : skip if VX != VY
+        if ((opcode & 0x000F) == 0) { // 9XY0 : skip if VX != VY
             uint8_t VX = registers.at((opcode & 0x0F00) >> 8);
             uint8_t VY = registers.at((opcode & 0x00F0) >> 4);
             programCounter += VX != VY ? 4 : 2;
