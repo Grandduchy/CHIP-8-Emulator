@@ -42,10 +42,11 @@ void Chip8::loadGame(const std::string& filePath) {
 
     if (size >= 4096 * 8) throw std::runtime_error("File is bigger than accpetable CHIP-8 memory range");
     else ifs.seekg(std::ios_base::beg);
+    std::cout << std::boolalpha;
+    std::cout << std::hex;
 
-    for(size_t i = 0; !ifs.eof(); i++) {
-        uint8_t opcode;
-        ifs.read(reinterpret_cast<char*>(&opcode), sizeof(uint8_t));
+    uint8_t opcode;
+    for (size_t i = 0; ifs.read(reinterpret_cast<char*>(&opcode), sizeof(uint8_t)) ; i++) {
         memory[i + 0x200] = opcode;
     }
 }
@@ -60,42 +61,42 @@ void Chip8::emulateCycle() {
 
     switch(opcode & 0xF000) { // get the leftmost bit
     case 0x0000:
-        if ((opcode & 0xF000) == 0x00E0) { // 00E0 : clear screen
-            std::cout << "Clear screen\n";
-            for (auto obj : pixels) {
-                std::fill(obj.begin(), obj.end(), 0);
-            }
-            programCounter += 2;
-        }
-        else if ((opcode & 0xF000) == 0x00EE) { // 00EE : return from subroutine
-            programCounter = stack[--stackPointer];
-            programCounter += 2;
-        }
-        else {
-            std::cerr << "Unsupported 0xNNN opcode\n";
+        switch(opcode & 0x00FF) {
+            case 0x00E0 : // 00E0 : clear screen
+                for (auto obj : pixels) {
+                    std::fill(obj.begin(), obj.end(), 0);
+                }
+                programCounter += 2;
+            break;
+            case 0x00EE : // 00EE : return from subroutine
+                programCounter = stack[--stackPointer];
+                programCounter += 2;
+            break;
+            default :
+                std::cerr << "Unsupported 0xNNN opcode recieved : " << opcode << "\n";
+            break;
         }
         break;
     case 0x1000: // 1NNN : jump to address NNN
         programCounter = 0x0FFF & opcode;
-
         break;
     case 0x2000: // 2NNN : call subroutine at NNN
-            stack[stackPointer] = programCounter;
-            stackPointer++;
-            programCounter = opcode & 0x0FFF;
+        stack[stackPointer] = programCounter;
+        stackPointer++;
+        programCounter = opcode & 0x0FFF;
         break;
     case 0x3000: { // 3XNN : skip if equal
-            uint8_t reg = 0x0F00 & opcode;
-            uint8_t num = 0x00FF & opcode;
-            programCounter += reg == num ? 4 : 2;
-    }
+        uint8_t reg = 0x0F00 & opcode;
+        uint8_t num = 0x00FF & opcode;
+        programCounter += reg == num ? 4 : 2;
         break;
+    }
     case 0x4000: {// 4XNN : skip if not equal
-            uint8_t reg = 0x0F00 & opcode;
-            uint8_t num = 0x00FF & opcode;
-            programCounter += reg != num ? 4 : 2;
-    }
+        uint8_t reg = 0x0F00 & opcode;
+        uint8_t num = 0x00FF & opcode;
+        programCounter += reg != num ? 4 : 2;
         break;
+    }
     case 0x5000:
         if ((opcode & 0xFFF) != 0) { // 5XY0 : skip if VX == VY
             uint8_t reg1 = 0x0F00 & opcode, reg2 = 0x00F0 & opcode;
@@ -230,7 +231,7 @@ void Chip8::emulateCycle() {
 
                 // The pixel must wrap around if it goes out of scope
                 uint8_t pixelY = (yPos + y) % HEIGHT;
-                uint8_t, pixelX = (xPos + x) % WIDTH;
+                uint8_t pixelX = (xPos + x) % WIDTH;
 
                 uint8_t& pixel = pixels[pixelY][pixelX];
                 if (isOn) {
@@ -346,6 +347,11 @@ void Chip8::emulateCycle() {
 
     }
     updateTimers();
+
+    if (opcode == 0) {
+        std::cout << "Ok \n";
+        programCounter +=2;
+    }
 
     std::cerr << std::dec << std::flush;
 }
