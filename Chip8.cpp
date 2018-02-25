@@ -82,26 +82,26 @@ void Chip8::emulateCycle() {
         programCounter = 0x0FFF & opcode;
         break;
     case 0x2000: // 2NNN : call subroutine at NNN
-        stack[stackPointer] = programCounter;
+        stack.at(stackPointer) = programCounter;
         stackPointer++;
         programCounter = opcode & 0x0FFF;
         break;
     case 0x3000: { // 3XNN : skip if VX equal NN
-        uint8_t reg = registers[(0x0F00 & opcode) >> 8];
+        uint8_t reg = registers.at((0x0F00 & opcode) >> 8);
         uint8_t num = 0x00FF & opcode;
         programCounter += reg == num ? 4 : 2;
         break;
     }
-    case 0x4000: {// 4XNN : skip if not equal
-        uint8_t reg = registers[(0x0F00 & opcode) >> 8];
+    case 0x4000: {// 4XNN : skip if VX does not equal NN
+        uint8_t reg = registers.at((0x0F00 & opcode) >> 8);
         uint8_t num = 0x00FF & opcode;
         programCounter += reg != num ? 4 : 2;
         break;
     }
     case 0x5000:
         if ((opcode & 0x00F) != 0) { // 5XY0 : skip if VX == VY
-            uint8_t reg1 = registers[(0x0F00 & opcode) >> 8];
-            uint8_t reg2 = registers[(0x00F0 & opcode) >> 4];
+            uint8_t reg1 = registers.at((0x0F00 & opcode) >> 8);
+            uint8_t reg2 = registers.at((0x00F0 & opcode) >> 4);
             programCounter += reg1 == reg2 ? 4 : 2;
         }
         else {
@@ -109,84 +109,86 @@ void Chip8::emulateCycle() {
         }
         break;
     case 0x6000: // 6XNN : set VX to NN
-        registers[(opcode & 0x0F00) >> 2] = opcode & 0x00FF;
+        std::cout << ((opcode & 0x0F00) >> 2) << "\n" << registers[80] << "\n";
+
+        registers.at((opcode & 0x0F00) >> 2) = opcode & 0x00FF;
         programCounter += 2;
         break;
     case 0x7000: // 7XNN : adds NN to VX
-        registers[(opcode & 0x0F00) >> 2] += (opcode & 0x00FF);
+        registers.at((opcode & 0x0F00) >> 2) += (opcode & 0x00FF);
         programCounter += 2;
         break;
     case 0x8000:
         switch(opcode & 0x000F) {
             case 0x0000 : // 8XY0 : set VX to VY
-                registers[(opcode & 0x0F00) >> 8] = registers[(opcode & 0x00F0) >> 4];
+                registers.at((opcode & 0x0F00) >> 8) = registers.at((opcode & 0x00F0) >> 4);
                 programCounter += 2;
                 break;
             case 0x0001 :  // 8XY1 : set VX to binary OR with VX and VY
-                registers[(opcode & 0x0F00) >> 8] |= registers[(opcode & 0x00F0) >> 4];
+                registers.at((opcode & 0x0F00) >> 8) |= registers.at((opcode & 0x00F0) >> 4);
                 programCounter += 2;
                 break;
             case 0x0002 :  // 8XY2 : set VX to binary AND with VX and VY
-                registers[(opcode & 0x0F00) >> 8] &= registers[(opcode & 0x00F0) >> 4];
+                registers.at((opcode & 0x0F00) >> 8) &= registers.at((opcode & 0x00F0) >> 4);
                 programCounter += 2;
                 break;
             case 0x0003 :  // 8XY3 : set VX to binary XOR with VX and VY
-                registers[(opcode & 0x0F00) >> 8] |= registers[(opcode & 0x00F0) >> 4];
+                registers.at((opcode & 0x0F00) >> 8) |= registers.at((opcode & 0x00F0) >> 4);
                 programCounter += 2;
                 break;
             case 0x0004 : {// 8XY4 : add VY to VX
-                uint16_t sum = registers[(opcode & 0x0F00) >> 8] + registers[(opcode & 0x00F0) >> 4];
-                registers[0xf] = sum > std::numeric_limits<uint8_t>::max() ? 1 : 0; // calculate the carry
+                uint16_t sum = registers.at((opcode & 0x0F00) >> 8) + registers.at((opcode & 0x00F0) >> 4);
+                std::get<0xF>(registers) = sum > std::numeric_limits<uint8_t>::max() ? 1 : 0; // calculate the carry
 
-                registers[(opcode & 0x0F00) >> 8] = sum;
+                registers.at((opcode & 0x0F00) >> 8) = sum;
                 programCounter += 2;
                 break;
             }
             case 0x0005 :  {// 8XY5 : subtract VY from VX and set to VX
-                int16_t sum = registers[(opcode & 0x0F00) >> 8] - registers[(opcode & 0x00F0) >> 4];
+                int16_t sum = registers.at((opcode & 0x0F00) >> 8) - registers.at((opcode & 0x00F0) >> 4);
                 if (sum <= -1) { // we need to borrow from VF
-                    if (registers[0xf] == 1) {// Can borrow
-                        registers[0xf] = 0;
-                        registers[(opcode & 0x0F00) >> 8] = sum + std::numeric_limits<uint8_t>::max();
+                    if (std::get<0xF>(registers) == 1) {// Can borrow
+                        std::get<0xF>(registers) = 0;
+                        registers.at((opcode & 0x0F00) >> 8) = sum + std::numeric_limits<uint8_t>::max();
                     }
                     else { // Can't borrow
-                        registers[0xf] = 1;
-                        registers[(opcode & 0x0F00) >> 8] = sum;
+                        std::get<0xF>(registers) = 1;
+                        registers.at((opcode & 0x0F00) >> 8) = sum;
                     }
                 }
                 else {
-                    registers[(opcode & 0x0F00) >> 8] = sum;
+                    registers.at((opcode & 0x0F00) >> 8) = sum;
                 }
                 programCounter += 2;
                 break;
             }
             case 0x0006 : // 8XY6 : right shift VY by one and store in VX
-                registers[0xF] = registers[(opcode & 0x00F0) >> 4] & 1; // store the least significant bit of VY in VF
-                registers[(opcode& 0x0F00) >> 8] = (registers[(opcode & 0x00F0) >> 4 ] >> 1);
+                std::get<0xF>(registers) = registers.at((opcode & 0x00F0) >> 4) & 1; // store the least significant bit of VY in VF
+                registers.at((opcode& 0x0F00) >> 8) = (registers.at((opcode & 0x00F0) >> 4 ) >> 1);
                 programCounter +=2;
                 break;
             case 0x0007 : {// 8XY7 : subtract VX from VY and set to VX
                 int16_t sum = registers[(opcode & 0x00F0) >> 4] - registers[(opcode & 0x0F00) >> 8];
                 if (sum <= -1) {
-                    if (registers[0xF] == 1) {
-                        registers[0xF] = 0;
-                        registers[(registers[(opcode & 0x0F00) >> 8])] = sum + std::numeric_limits<uint8_t>::max();
+                    if (std::get<0xF>(registers) == 1) {
+                        std::get<0xF>(registers) = 0;
+                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum + std::numeric_limits<uint8_t>::max();
                     }
                     else {
-                        registers[0xF] = 1;
-                        registers[(registers[(opcode & 0x0F00) >> 8])] = sum;
+                        std::get<0xF>(registers) = 1;
+                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum;
                     }
                 }
                 else {
-                    registers[(registers[(opcode & 0x0F00) >> 8])] = sum;
+                    registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum;
                 }
 
                 programCounter += 2;
                 break;
             }
             case 0x000E :// 8XYE : left shift VY by one and store in VX
-                registers[0xF] = (registers[(opcode & 0x00F0) >> 4] & (1 << 8)) >> 8; // store the greatest significant bit of VY in VF
-                registers[(opcode & 0x0F00) >> 8] = (1 << registers[(opcode & 0x00F0) >> 4]);
+                std::get<0xF>(registers) = (registers.at((opcode & 0x00F0) >> 4) & (1 << 8)) >> 8; // store the greatest significant bit of VY in VF
+                registers.at((opcode & 0x0F00) >> 8) = (1 << registers.at((opcode & 0x00F0) >> 4));
                 programCounter += 2;
                 break;
             default:
@@ -196,8 +198,8 @@ void Chip8::emulateCycle() {
         break;
     case 0x9000:
         if ((opcode & 0x000F) != 0) { // 9XY0 : skip if VX != VY
-            uint8_t VX = registers[(opcode & 0x0F00) >> 8];
-            uint8_t VY = registers[(opcode & 0x00F0) >> 4];
+            uint8_t VX = registers.at((opcode & 0x0F00) >> 8);
+            uint8_t VY = registers.at((opcode & 0x00F0) >> 4);
             programCounter += VX != VY ? 4 : 2;
         }
         else {
@@ -212,20 +214,20 @@ void Chip8::emulateCycle() {
         programCounter = registers[0] + (opcode & 0x0FFF);
         break;
     case 0xC000: // CXNN : set VX to a random number Binary ANDed by NN, random number is unsigned 8 bits.
-        registers[(opcode & 0x0F00) >> 8] = getRand8Bit() & (opcode & 0x00FF);
+        registers.at((opcode & 0x0F00) >> 8) = getRand8Bit() & (opcode & 0x00FF);
         programCounter += 2;
         break;
     case 0xD000: {// DXYN : Draw sprite at VX, Vy of N height starting at I.
-        uint8_t xPos = registers[(opcode & 0x0F00) >> 8];
-        uint8_t yPos = registers[(opcode & 0x00F0) >> 4];
+        uint8_t xPos = registers.at((opcode & 0x0F00) >> 8);
+        uint8_t yPos = registers.at((opcode & 0x00F0) >> 4);
         uint8_t height = opcode & 0x000F;
         uint8_t width = 8;
 
-        registers[0xF] = 0;
+        std::get<0xF>(registers) = 0;
 
         for (uint8_t y = 0; y != height; y++) {
             // The I register points to the binary representation of the sprite
-            uint8_t binaryImage = memory[indexRegister + y];
+            uint8_t binaryImage = memory.at(indexRegister + y);
             // go through each bit
             for (uint8_t x = 0; x != width; x++) {
                 uint8_t mask = 0x80 >> x; // start from greatest bit to least, 0x80 is the greatest bit in uint_8
@@ -238,7 +240,7 @@ void Chip8::emulateCycle() {
                 uint8_t& pixel = pixels[pixelY][pixelX];
                 if (isOn) {
                     if (pixel == 1)
-                        registers[0xF] = 1;
+                        std::get<0xF>(registers) = 1;
                     pixel ^= 1;
                 }
 
@@ -254,12 +256,12 @@ void Chip8::emulateCycle() {
             case 0x009E : {// EX9E : skip if key stored in VX is turned on
                 // this should be changed in the future if its really a boolean condition for keys
                 // since currently its an integer.
-                bool isOn = registers[(opcode & 0x0F00) >> 8] == 1;
+                bool isOn = registers.at((opcode & 0x0F00) >> 8) == 1;
                 programCounter += isOn ? 4 : 2;
                 break;
             }
             case 0x00A1 : {// EXA1 : skip if key stored in VX isn't pressed
-                 bool isOn = registers[(opcode & 0x0F00) >> 8] == 1;
+                 bool isOn = registers.at((opcode & 0x0F00) >> 8) == 1;
                  programCounter += isOn ? 2 : 4;
                  break;
             }
@@ -271,7 +273,7 @@ void Chip8::emulateCycle() {
     case 0xF000:
         switch(opcode & 0x00FF) {
             case 0x0007 : // FX07 : Set VX to the delay timer
-                registers[(opcode & 0x0F00) >> 8] = delayTimer;
+                registers.at((opcode & 0x0F00) >> 8) = delayTimer;
                 programCounter += 2;
                 break;
             case 0x000A : {// FX0A : wait until a key is pressed and store to VX
@@ -279,30 +281,30 @@ void Chip8::emulateCycle() {
                     return i == 0;
                 });
                 if (it != keys.end()) {
-                    registers[ (opcode & 0x0F00) >> 8] = std::distance(keys.cbegin(), it);
+                    registers.at( (opcode & 0x0F00) >> 8) = std::distance(keys.cbegin(), it);
                     programCounter += 2;
                 }
                 break;
             }
             case 0x0015 : // FX15 : Set the delay timer to VX
-                delayTimer = registers[(opcode & 0x0F00) >> 8];
+                delayTimer = registers.at((opcode & 0x0F00) >> 8);
                 programCounter += 2;
                 break;
             case 0x0018 : // FX18 : Set the sound timer to VX
-                soundTimer = registers[(opcode & 0x0F00) >> 8];
+                soundTimer = registers.at((opcode & 0x0F00) >> 8);
                 programCounter += 2;
                 break;
             case 0x001E : {// FX1E : adds VX to I
-                if (indexRegister + registers[(opcode & 0x0F00) >> 8] > 0xFFF)
-                    registers[0xF] = 1;
+                if (indexRegister + registers.at((opcode & 0x0F00) >> 8) > 0xFFF)
+                    std::get<0xF>(registers) = 1;
                 else
-                    registers[0xF] = 0;
-                indexRegister += registers[(opcode & 0x0F00) >> 8];
+                    std::get<0xF>(registers) = 0;
+                indexRegister += registers.at((opcode & 0x0F00) >> 8);
                 programCounter += 2;
             }
                 break;
             case 0x0029 : {// FX29 : Set I to the sprite location for a character in VX
-                uint8_t character = registers[(0x0F00 & opcode) >> 8];
+                uint8_t character = registers.at((0x0F00 & opcode) >> 8);
                 int intPos = static_cast<int>(character - '0');
                 int charPos = static_cast<int>(character - 'A');
 
@@ -316,16 +318,16 @@ void Chip8::emulateCycle() {
                 break;
             }
             case 0x0033 :
-                memory[indexRegister] = registers[(opcode & 0x0F00) >> 8] / 100;
-                memory[indexRegister + 1] = (registers[(opcode & 0x0F00) >> 8] / 10) % 10;
-                memory[indexRegister + 2] = (registers[(opcode & 0x0F00) >> 8] % 100) % 10;
+                memory.at(indexRegister) = registers.at((opcode & 0x0F00) >> 8) / 100;
+                memory.at(indexRegister + 1) = (registers.at((opcode & 0x0F00) >> 8) / 10) % 10;
+                memory.at(indexRegister + 2) = (registers.at((opcode & 0x0F00) >> 8) % 100) % 10;
                 programCounter += 2;
                 break;
             case 0x0055 : { // FX55 : Write registers into memory starting from V0 to (including) VX starting at I, I is incremented by 1.
                 auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1; // <- Note to check this, +1 may not be needed.
                 for (auto it = registers.cbegin(); it != endRegister; it++) {
                     auto pos = std::distance(registers.cbegin(), it);
-                    memory[indexRegister++] = registers[pos];
+                    memory.at(indexRegister++) = registers.at(pos);
                 }
                 programCounter += 2;
                 break;
@@ -334,7 +336,7 @@ void Chip8::emulateCycle() {
                 auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
                 for (auto it = registers.cbegin(); it != endRegister; it++) {
                        auto pos = std::distance(registers.cbegin(), it);
-                        registers[pos] = memory[indexRegister++];
+                        registers.at(pos) = memory.at(indexRegister++);
                 }
                 programCounter += 2;
                 break;
@@ -350,6 +352,7 @@ void Chip8::emulateCycle() {
     }
     updateTimers();
 
+    // TODO : Remove this after testing
     if (opcode == 0) {
         std::cout << "Ok \n";
         programCounter +=2;
