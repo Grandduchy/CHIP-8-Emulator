@@ -40,7 +40,7 @@ void Chip8::loadGame(const std::string& filePath) {
     ifs.seekg(std::ios_base::end);
     auto size = ifs.tellg();
 
-    if (size >= 4096 * 8) throw std::runtime_error("File is bigger than accpetable CHIP-8 memory range");
+    if (size >= 0xFFF - 0x200) throw std::runtime_error("File is bigger than accpetable CHIP-8 memory range");
     else ifs.seekg(std::ios_base::beg);
     std::cout << std::boolalpha;
     std::cout << std::hex;
@@ -66,6 +66,7 @@ void Chip8::emulateCycle() {
                 for (auto obj : pixels) {
                     std::fill(obj.begin(), obj.end(), 0);
                 }
+                drawFlag = true;
                 programCounter += 2;
             break;
             case 0x00EE : // 00EE : return from subroutine
@@ -85,21 +86,22 @@ void Chip8::emulateCycle() {
         stackPointer++;
         programCounter = opcode & 0x0FFF;
         break;
-    case 0x3000: { // 3XNN : skip if equal
-        uint8_t reg = 0x0F00 & opcode;
+    case 0x3000: { // 3XNN : skip if VX equal NN
+        uint8_t reg = registers[(0x0F00 & opcode) >> 8];
         uint8_t num = 0x00FF & opcode;
         programCounter += reg == num ? 4 : 2;
         break;
     }
     case 0x4000: {// 4XNN : skip if not equal
-        uint8_t reg = 0x0F00 & opcode;
+        uint8_t reg = registers[(0x0F00 & opcode) >> 8];
         uint8_t num = 0x00FF & opcode;
         programCounter += reg != num ? 4 : 2;
         break;
     }
     case 0x5000:
-        if ((opcode & 0xFFF) != 0) { // 5XY0 : skip if VX == VY
-            uint8_t reg1 = 0x0F00 & opcode, reg2 = 0x00F0 & opcode;
+        if ((opcode & 0x00F) != 0) { // 5XY0 : skip if VX == VY
+            uint8_t reg1 = registers[(0x0F00 & opcode) >> 8];
+            uint8_t reg2 = registers[(0x00F0 & opcode) >> 4];
             programCounter += reg1 == reg2 ? 4 : 2;
         }
         else {
