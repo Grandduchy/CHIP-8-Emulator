@@ -304,19 +304,11 @@ void Chip8::emulateCycle() {
                 break;
             case 0x0029 : {// FX29 : Set I to the sprite location for a character in VX
                 uint8_t character = registers.at((0x0F00 & opcode) >> 8);
-                int intPos = static_cast<int>(character - '0');
-                int charPos = static_cast<int>(character - 'A');
-
-                if (intPos <= 9 && intPos >= 0) // the character is an integer
-                    indexRegister = intPos * 5;
-                else if (charPos <= 5 && charPos >= 0) // character is a character
-                    indexRegister = charPos * 5 + (5 * 10);
-                else
-                    std::cerr << "Character in VX is out of scope of the character set\n";
+                indexRegister = character * 5;
                 programCounter += 2;
                 break;
             }
-            case 0x0033 :
+            case 0x0033 : // FX33 : Store the BCD of VX to I
                 memory.at(indexRegister) = registers.at((opcode & 0x0F00) >> 8) / 100;
                 memory.at(indexRegister + 1) = (registers.at((opcode & 0x0F00) >> 8) / 10) % 10;
                 memory.at(indexRegister + 2) = (registers.at((opcode & 0x0F00) >> 8) % 100) % 10;
