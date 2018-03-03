@@ -216,7 +216,7 @@ void Chip8::emulateCycle() {
         registers.at((opcode & 0x0F00) >> 8) = getRand8Bit() & (opcode & 0x00FF);
         programCounter += 2;
         break;
-    case 0xD000: {// DXYN : Draw sprite at VX, Vy of N height starting at I.
+    case 0xD000: {// DXYN : Draw sprite at VX, VY of N height starting at I.
         uint8_t xPos = registers.at((opcode & 0x0F00) >> 8);
         uint8_t yPos = registers.at((opcode & 0x00F0) >> 4);
         uint8_t height = opcode & 0x000F;
@@ -374,7 +374,7 @@ void Chip8::updateTimers() noexcept {
 
 uint8_t Chip8::getRand8Bit() {
     static std::random_device device;
-    static std::default_random_engine engine;
+    static std::default_random_engine engine(device());
     static std::uniform_int_distribution<short> distance(0,255); // <-- undefined behavior if short is uint8_t
     return distance(engine);
 }
