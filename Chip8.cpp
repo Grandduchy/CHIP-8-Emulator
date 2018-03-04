@@ -343,12 +343,6 @@ void Chip8::emulateCycle() {
     }
     updateTimers();
 
-    // TODO : Remove this after testing
-    if (opcode == 0) {
-        std::cout << "Ok \n";
-        programCounter +=2;
-    }
-
     std::cerr << std::dec << std::flush;
 }
 
