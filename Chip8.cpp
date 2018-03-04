@@ -40,7 +40,8 @@ void Chip8::loadGame(const std::string& filePath) {
     ifs.seekg(std::ios_base::end);
     auto size = ifs.tellg();
 
-    if (size >= 0xFFF - 0x200) throw std::runtime_error("File is bigger than accpetable CHIP-8 memory range");
+    if (size >= (0xFFF - 0x200) * std::numeric_limits<uint8_t>::max())
+        throw std::runtime_error("File is bigger than accpetable CHIP-8 memory range");
     else ifs.seekg(std::ios_base::beg);
     std::cout << std::boolalpha;
     std::cout << std::hex;
@@ -315,7 +316,7 @@ void Chip8::emulateCycle() {
                 programCounter += 2;
                 break;
             case 0x0055 : { // FX55 : Write registers into memory starting from V0 to (including) VX starting at I, I is incremented by 1.
-                auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1; // <- Note to check this, +1 may not be needed.
+                auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
                 for (auto it = registers.cbegin(); it != endRegister; it++) {
                     auto pos = std::distance(registers.cbegin(), it);
                     memory.at(indexRegister++) = registers.at(pos);
