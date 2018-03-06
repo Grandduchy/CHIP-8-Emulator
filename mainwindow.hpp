@@ -14,6 +14,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+private slots:
+    void fileButtonPressed();
+    void playButtonPressed();
+
 private:
     Ui::MainWindow *ui;
 };
