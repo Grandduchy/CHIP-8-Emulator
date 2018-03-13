@@ -15,11 +15,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += main.cpp \
     Chip8.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    game.cpp
 
 HEADERS += \
     Chip8.hpp \
-    mainwindow.hpp
+    mainwindow.hpp \
+    game.hpp
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    game.ui
