@@ -3,11 +3,15 @@
 
 #include <QFileDialog>
 #include <QPushButton>
+#include <QFileInfo>
+#include <QString>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent), ui(new Ui::MainWindow) {
     ui->setupUi(this);
     connect(ui->fileButton, &QPushButton::pressed, this, &MainWindow::fileButtonPressed);
+    connect(ui->playButton, &QPushButton::pressed, this, &MainWindow::playButtonPressed);
 }
 
 MainWindow::~MainWindow() {
@@ -27,10 +31,18 @@ void MainWindow::fileButtonPressed() {
         file = files[0];
 
     // Change the string in the text edit
-    ui->textEdit->setText(file);
+    ui->lineEdit->setText(file);
 
 }
 
 void MainWindow::playButtonPressed() {
-
+    QString fileName = ui->lineEdit->text();
+    QFileInfo fileInfo(fileName);
+    if (fileInfo.exists() && fileInfo.isFile())
+        emit playGame(fileName);
+    else {
+        QMessageBox* box = new QMessageBox(this);
+        box->setText("File does not exist or is not a file.");
+        box->exec();
+    }
 }

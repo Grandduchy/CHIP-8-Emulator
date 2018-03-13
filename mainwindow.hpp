@@ -17,6 +17,8 @@ public:
 private slots:
     void fileButtonPressed();
     void playButtonPressed();
+signals:
+    void playGame(const QString&);
 
 private:
     Ui::MainWindow *ui;
