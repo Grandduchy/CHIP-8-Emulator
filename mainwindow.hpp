@@ -2,6 +2,7 @@
 #define MAINWINDOW_HPP
 
 #include <QMainWindow>
+#include "game.hpp"
 
 namespace Ui {
 class MainWindow;
@@ -11,17 +12,15 @@ class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private slots:
     void fileButtonPressed();
     void playButtonPressed();
-signals:
-    void playGame(const QString&);
-
 private:
     Ui::MainWindow *ui;
+    Game* game;
 };
 
 #endif // MAINWINDOW_HPP

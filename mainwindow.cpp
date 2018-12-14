@@ -6,9 +6,10 @@
 #include <QFileInfo>
 #include <QString>
 #include <QMessageBox>
+#include <game.hpp>
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent), ui(new Ui::MainWindow) {
+    QMainWindow(parent), ui(new Ui::MainWindow), game() {
     ui->setupUi(this);
     connect(ui->fileButton, &QPushButton::pressed, this, &MainWindow::fileButtonPressed);
     connect(ui->playButton, &QPushButton::pressed, this, &MainWindow::playButtonPressed);
@@ -17,7 +18,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow() {
     delete ui;
 }
-
 
 void MainWindow::fileButtonPressed() {
     // Get the location of the file
@@ -38,8 +38,14 @@ void MainWindow::fileButtonPressed() {
 void MainWindow::playButtonPressed() {
     QString fileName = ui->lineEdit->text();
     QFileInfo fileInfo(fileName);
-    if (fileInfo.exists() && fileInfo.isFile())
-        emit playGame(fileName);
+    if (fileInfo.exists() && fileInfo.isFile()) {
+
+        if (game == nullptr)
+            game = new Game();
+        game->setFile(fileName);
+        game->resetgame();
+        game->show();
+    }
     else {
         QMessageBox* box = new QMessageBox(this);
         box->setText("File does not exist or is not a file.");
