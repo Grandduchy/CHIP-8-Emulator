@@ -36,7 +36,8 @@ void Chip8::initalize() {
 void Chip8::loadGame(const std::string& filePath) {
 
     std::ifstream ifs(filePath, std::ios_base::in | std::ios_base::binary);
-    if (!ifs.good()) throw std::runtime_error("File does not exist");
+    if (!ifs.good())
+        throw std::runtime_error("File does not exist");
     ifs.seekg(std::ios_base::end);
     auto size = ifs.tellg();
 
@@ -59,7 +60,7 @@ void Chip8::loadGame(const std::string& filePath) {
 void Chip8::emulateCycle() {
     std::cerr << std::hex;
     uint16_t opcode = memory[programCounter] << 8 | memory[programCounter + 1];
-
+    std::cerr << opcode;
     switch(opcode & 0xF000) { // get the leftmost bit
     case 0x0000:
         switch(opcode & 0x00FF) {

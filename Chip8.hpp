@@ -19,6 +19,7 @@
 
 
 class Chip8 {
+    friend class Game;
 public:
 
     Chip8();

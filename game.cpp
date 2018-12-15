@@ -1,6 +1,9 @@
 #include "game.hpp"
 #include "ui_game.h"
 #include <Chip8.hpp>
+#include <iostream>
+#include <QPainter>
+#include <QTextStream>
 
 
 Game::Game(QWidget *parent) :
@@ -17,7 +20,11 @@ Game::~Game() {
 
 void Game::setFile(const QString& file) {
     this->filepath = file;
-    emulator.loadGame(file.toStdString());
+    try {
+        emulator.loadGame(file.toStdString());
+    } catch(const std::exception& e) {
+        std::cerr << "Error loading game into emulator, Error : " << e.what() << std::endl;
+    }
 }
 
 void Game::paintEvent(QPaintEvent *) {
@@ -31,7 +38,7 @@ void Game::timerEvent(QTimerEvent *) {
 
 void Game::runCycle() {
     emulator.emulateCycle();
-    if (emulator.isDrawFlag())
+   // if (emulator.isDrawFlag())
         repaint();
 }
 
@@ -45,5 +52,19 @@ void Game::resetgame() {
 }
 
 void Game::paint() {
+    QTextStream cout(stdout);
+    const std::array<std::array<uint8_t, WIDTH>, HEIGHT>& pixels = emulator.pixels;
+    for(auto yIter = pixels.cbegin(); yIter != pixels.cend(); yIter++) {
+        for (auto xIter = yIter->cbegin(); xIter != yIter->cend(); xIter++) {
+            auto y = static_cast<int>(std::distance(yIter, pixels.cend()));
+            auto x = static_cast<int>(std::distance(xIter, yIter->cend()));
+            uint8_t type = *xIter; // 0 -> white, 1 -> black
 
+            QPainter painter(this);
+            QColor color = type == 1 ? Qt::white : Qt::black;
+            painter.setBrush(color);
+            painter.drawRect(x, y, 10, 10);
+
+        }
+    }
 }
