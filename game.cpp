@@ -10,7 +10,7 @@ Game::Game(QWidget *parent) :
     QWidget(parent), ui(new Ui::Game) {
     ui->setupUi(this);
     this->setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
-    timer.start(100, this);
+    timer.start(1/60, this);
     emulator.initalize();
 }
 
@@ -53,18 +53,24 @@ void Game::resetgame() {
 
 void Game::paint() {
     QTextStream cout(stdout);
+    int i = 0;
+
     const std::array<std::array<uint8_t, WIDTH>, HEIGHT>& pixels = emulator.pixels;
     for(auto yIter = pixels.cbegin(); yIter != pixels.cend(); yIter++) {
         for (auto xIter = yIter->cbegin(); xIter != yIter->cend(); xIter++) {
-            auto y = static_cast<int>(std::distance(yIter, pixels.cend()));
-            auto x = static_cast<int>(std::distance(xIter, yIter->cend()));
+            auto y = HEIGHT - static_cast<int>(std::distance(yIter, pixels.cend()));
+            auto x = WIDTH - static_cast<int>(std::distance(xIter, yIter->cend()));
             uint8_t type = *xIter; // 0 -> white, 1 -> black
 
             QPainter painter(this);
-            QColor color = type == 1 ? Qt::white : Qt::black;
+            QColor color = type == 0 ? Qt::white : Qt::black;
+
             painter.setBrush(color);
-            painter.drawRect(x, y, 10, 10);
+            int enlargement = 10;
+            painter.drawRect(x * enlargement, y * enlargement, enlargement, enlargement);
 
         }
     }
+
+    cout << i << endl;
 }
