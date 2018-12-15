@@ -16,7 +16,7 @@ public:
     explicit Game(QWidget *parent = nullptr);
     ~Game() override;
 
-    void setFile(QString& str);
+    void setFile(const QString& str);
     void resetgame();
 protected:
     void paintEvent(QPaintEvent*) override;
@@ -26,6 +26,8 @@ protected:
 private slots:
     void runGame(const QString&);
 private:
+    void runCycle();
+
     Ui::Game *ui;
     QBasicTimer timer;
     QString filepath;

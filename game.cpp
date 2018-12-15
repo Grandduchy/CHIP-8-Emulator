@@ -8,27 +8,36 @@ Game::Game(QWidget *parent) :
     ui->setupUi(this);
     this->setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
     timer.start(100, this);
+    emulator.initalize();
 }
 
 Game::~Game() {
     delete ui;
 }
 
-void Game::setFile(QString& str) {
-    this->filepath = str;
-
+void Game::setFile(const QString& file) {
+    this->filepath = file;
+    emulator.loadGame(file.toStdString());
 }
 
 void Game::paintEvent(QPaintEvent *) {
     paint();
+
 }
 
 void Game::timerEvent(QTimerEvent *) {
-    repaint();
+    runCycle();
 }
 
-void Game::runGame(const QString&) {
+void Game::runCycle() {
+    emulator.emulateCycle();
+    if (emulator.isDrawFlag())
+        repaint();
+}
 
+
+void Game::runGame(const QString& fileName) {
+    Q_UNUSED(fileName);
 }
 
 void Game::resetgame() {

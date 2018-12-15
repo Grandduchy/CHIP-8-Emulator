@@ -42,7 +42,7 @@ void MainWindow::playButtonPressed() {
 
         if (game == nullptr)
             game = new Game();
-        game->setFile(fileName);
+        //game->setFile(fileName);
         game->resetgame();
         game->show();
     }
