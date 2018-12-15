@@ -34,6 +34,8 @@ public:
 
     void setKeys();
 
+    void removeDrawFlag() noexcept;
+
 private:
     uint16_t currentOpcode;
     std::array<uint8_t, 4096> memory{};

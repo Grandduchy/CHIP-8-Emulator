@@ -53,6 +53,10 @@ void Chip8::loadGame(const std::string& filePath) {
     }
 }
 
+void Chip8::removeDrawFlag() noexcept {
+    drawFlag = false;
+}
+
 // 1. Fetch opcode
 // 2. Decode opcode
 // 3. Executve opcode
@@ -60,7 +64,6 @@ void Chip8::loadGame(const std::string& filePath) {
 void Chip8::emulateCycle() {
     std::cerr << std::hex;
     uint16_t opcode = memory[programCounter] << 8 | memory[programCounter + 1];
-    std::cerr << opcode;
     switch(opcode & 0xF000) { // get the leftmost bit
     case 0x0000:
         switch(opcode & 0x00FF) {

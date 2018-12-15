@@ -3,14 +3,19 @@
 #include <Chip8.hpp>
 #include <iostream>
 #include <QPainter>
+#include <thread>
 #include <QTextStream>
 
 
 Game::Game(QWidget *parent) :
     QWidget(parent), ui(new Ui::Game) {
     ui->setupUi(this);
-    this->setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
-    timer.start(1/60, this);
+    this->timer = new QTimer(this);
+    setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
+    connect(timer, &QTimer::timeout, this, &Game::runCycle);
+    timer->start(std::chrono::milliseconds(1));
+
+
     emulator.initalize();
 }
 
@@ -38,8 +43,11 @@ void Game::timerEvent(QTimerEvent *) {
 
 void Game::runCycle() {
     emulator.emulateCycle();
-   // if (emulator.isDrawFlag())
+    if (emulator.isDrawFlag()) {
         repaint();
+        emulator.removeDrawFlag();
+    }
+
 }
 
 
@@ -53,7 +61,6 @@ void Game::resetgame() {
 
 void Game::paint() {
     QTextStream cout(stdout);
-    int i = 0;
 
     const std::array<std::array<uint8_t, WIDTH>, HEIGHT>& pixels = emulator.pixels;
     for(auto yIter = pixels.cbegin(); yIter != pixels.cend(); yIter++) {
@@ -72,5 +79,4 @@ void Game::paint() {
         }
     }
 
-    cout << i << endl;
 }

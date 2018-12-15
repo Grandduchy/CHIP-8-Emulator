@@ -2,7 +2,7 @@
 #define GAME_HPP
 
 #include <QWidget>
-#include <QBasicTimer>
+#include <QTimer>
 #include <Chip8.hpp>
 
 namespace Ui {
@@ -29,7 +29,7 @@ private:
     void runCycle();
 
     Ui::Game *ui;
-    QBasicTimer timer;
+    QTimer* timer;
     QString filepath;
     Chip8 emulator;
 };
