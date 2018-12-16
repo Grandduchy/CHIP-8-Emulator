@@ -13,7 +13,7 @@ Game::Game(QWidget *parent) :
     this->timer = new QTimer(this);
     setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
     connect(timer, &QTimer::timeout, this, &Game::runCycle);
-    timer->start(std::chrono::milliseconds(1));
+    timer->start(0);
 
 
     emulator.initalize();
@@ -61,7 +61,8 @@ void Game::resetgame() {
 
 void Game::paint() {
     QTextStream cout(stdout);
-
+    QPainter painter(this);
+    QColor color;
     const std::array<std::array<uint8_t, WIDTH>, HEIGHT>& pixels = emulator.pixels;
     for(auto yIter = pixels.cbegin(); yIter != pixels.cend(); yIter++) {
         for (auto xIter = yIter->cbegin(); xIter != yIter->cend(); xIter++) {
@@ -69,9 +70,8 @@ void Game::paint() {
             auto x = WIDTH - static_cast<int>(std::distance(xIter, yIter->cend()));
             uint8_t type = *xIter; // 0 -> white, 1 -> black
 
-            QPainter painter(this);
-            QColor color = type == 0 ? Qt::white : Qt::black;
-
+            color = type == 0 ? Qt::white : Qt::black;
+            painter.setPen(color);
             painter.setBrush(color);
             int enlargement = 10;
             painter.drawRect(x * enlargement, y * enlargement, enlargement, enlargement);
