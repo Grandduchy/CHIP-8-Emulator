@@ -64,18 +64,20 @@ void Game::paint() {
     QPainter painter(this);
     QColor color;
     const std::array<std::array<uint8_t, WIDTH>, HEIGHT>& pixels = emulator.pixels;
+    painter.setPen(Qt::white);
+    painter.setBrush(Qt::white);
+    painter.drawRect(0, 0, WIDTH * 10, HEIGHT * 10);
+    painter.setPen(Qt::black);
+    painter.setBrush(Qt::black);
+    int enlargement = 10;
     for(auto yIter = pixels.cbegin(); yIter != pixels.cend(); yIter++) {
         for (auto xIter = yIter->cbegin(); xIter != yIter->cend(); xIter++) {
             auto y = HEIGHT - static_cast<int>(std::distance(yIter, pixels.cend()));
             auto x = WIDTH - static_cast<int>(std::distance(xIter, yIter->cend()));
             uint8_t type = *xIter; // 0 -> white, 1 -> black
-
-            color = type == 0 ? Qt::white : Qt::black;
-            painter.setPen(color);
-            painter.setBrush(color);
-            int enlargement = 10;
-            painter.drawRect(x * enlargement, y * enlargement, enlargement, enlargement);
-
+            if (type == 0) {
+                painter.drawRect(x * enlargement, y * enlargement, enlargement, enlargement);
+            }
         }
     }
 
