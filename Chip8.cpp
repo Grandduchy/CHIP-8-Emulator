@@ -29,7 +29,7 @@ void Chip8::initalize() {
 
     // load the fontset
     for (int i = 0; i < 80; i++)
-        memory[i] = fontset[i];
+        memory[static_cast<std::size_t>(i)] = fontset[i];
 }
 
 // load the game into memory
@@ -63,7 +63,7 @@ void Chip8::removeDrawFlag() noexcept {
 // 4. Update timers
 void Chip8::emulateCycle() {
     std::cerr << std::hex;
-    uint16_t opcode = memory[programCounter] << 8 | memory[programCounter + 1];
+    uint16_t opcode = static_cast<uint16_t>(memory[programCounter] << 8 | memory[programCounter + 1]);
     switch(opcode & 0xF000) { // get the leftmost bit
     case 0x0000:
         switch(opcode & 0x00FF) {
@@ -143,7 +143,7 @@ void Chip8::emulateCycle() {
                 uint16_t sum = registers.at((opcode & 0x0F00) >> 8) + registers.at((opcode & 0x00F0) >> 4);
                 std::get<0xF>(registers) = sum > std::numeric_limits<uint8_t>::max() ? 1 : 0; // calculate the carry
 
-                registers.at((opcode & 0x0F00) >> 8) = sum;
+                registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
                 programCounter += 2;
                 break;
             }
@@ -153,15 +153,15 @@ void Chip8::emulateCycle() {
                 if (sum <= -1) { // we need to borrow from VF
                     if (std::get<0xF>(registers) == 1) {// Can borrow
                         std::get<0xF>(registers) = 0;
-                        registers.at((opcode & 0x0F00) >> 8) = sum + std::numeric_limits<uint8_t>::max();
+                        registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
                     }
                     else { // Can't borrow
-                        registers.at((opcode & 0x0F00) >> 8) = sum;
+                        registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
                     }
                 }
                 else {
 
-                    registers.at((opcode & 0x0F00) >> 8) = sum;
+                    registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
                 }
                 programCounter += 2;
                 break;
@@ -177,14 +177,14 @@ void Chip8::emulateCycle() {
                 if (sum <= -1) {
                     if (std::get<0xF>(registers) == 1) {
                         std::get<0xF>(registers) = 0;
-                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum + std::numeric_limits<uint8_t>::max();
+                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
                     }
                     else {
-                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum;
+                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
                     }
                 }
                 else {
-                    registers.at((registers.at((opcode & 0x0F00) >> 8))) = sum;
+                    registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
                 }
 
                 programCounter += 2;
@@ -192,7 +192,7 @@ void Chip8::emulateCycle() {
             }
             case 0x000E :// 8XYE : left shift VY by one and store in VX
                 std::get<0xF>(registers) = (registers.at((opcode & 0x00F0) >> 4) & (1 << 8)) >> 8; // store the greatest significant bit of VY in VF
-                registers.at((opcode & 0x0F00) >> 8) = (1 << registers.at((opcode & 0x00F0) >> 4));
+                registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(1 << registers.at((opcode & 0x00F0) >> 4));
                 programCounter += 2;
                 break;
             default:
@@ -285,7 +285,7 @@ void Chip8::emulateCycle() {
                     return i == 0;
                 });
                 if (it != keys.end()) {
-                    registers.at( (opcode & 0x0F00) >> 8) = std::distance(keys.cbegin(), it);
+                    registers.at( (opcode & 0x0F00) >> 8) = static_cast<uint8_t>(std::distance(keys.cbegin(), it));
                     programCounter += 2;
                 }
                 break;
@@ -323,7 +323,7 @@ void Chip8::emulateCycle() {
                 auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
                 for (auto it = registers.cbegin(); it != endRegister; it++) {
                     auto pos = std::distance(registers.cbegin(), it);
-                    memory.at(indexRegister++) = registers.at(pos);
+                    memory.at(indexRegister++) = static_cast<uint8_t>(registers.at(static_cast<std::size_t>(pos)));
                 }
                 programCounter += 2;
                 break;
@@ -332,7 +332,7 @@ void Chip8::emulateCycle() {
                 auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
                 for (auto it = registers.cbegin(); it != endRegister; it++) {
                        auto pos = std::distance(registers.cbegin(), it);
-                        registers.at(pos) = memory.at(indexRegister++);
+                        registers.at(static_cast<std::size_t>(pos)) = memory.at(indexRegister++);
                 }
                 programCounter += 2;
                 break;
@@ -367,7 +367,7 @@ uint8_t Chip8::getRand8Bit() {
     static std::random_device device;
     static std::default_random_engine engine(device());
     static std::uniform_int_distribution<short> distance(0,255); // <-- undefined behavior if short is uint8_t
-    return distance(engine);
+    return static_cast<uint8_t>(distance(engine));
 }
 
 // Determines if it needs to draw the screen
