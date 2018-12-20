@@ -28,7 +28,7 @@ private slots:
     void runGame(const QString&);
 private:
     void runCycle();
-
+    void resetKeys();
     Ui::Game *ui;
     QTimer* timer;
     QString filepath;

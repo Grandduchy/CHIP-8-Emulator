@@ -44,6 +44,7 @@ void Game::timerEvent(QTimerEvent *) {
 
 void Game::runCycle() {
     emulator.emulateCycle();
+    resetKeys();
     if (emulator.isDrawFlag()) {
         repaint();
         emulator.removeDrawFlag();
@@ -56,64 +57,44 @@ void Game::runGame(const QString& fileName) {
     Q_UNUSED(fileName);
 }
 
-void Game::resetgame() {
-
+void Game::resetKeys() {
+    std::fill(emulator.keys.begin(), emulator.keys.end(), 0);
 }
 
 
 void Game::keyPressEvent(QKeyEvent* key) {
-    std::array<uint8_t, 16>& emulatorKeys = emulator.keys;
-    switch(key->key()) {
-    case Qt::Key_1 :
-        emulatorKeys.at(0) = 1;
-        break;
-    case Qt::Key_2 :
-        emulatorKeys.at(1) = 1;
-        break;
-    case Qt::Key_3 :
-        emulatorKeys.at(2) = 1;
-        break;
-    case Qt::Key_4 :
-        emulatorKeys.at(3) = 1;
-        break;
-    case Qt::Key_Q :
-        emulatorKeys.at(4) = 1;
-        break;
-    case Qt::Key_W :
-        emulatorKeys[5] = 1;
-        break;
-    case Qt::Key_E :
-        emulatorKeys[6] = 1;
-        break;
-    case Qt::Key_R :
-        emulatorKeys[7] = 1;
-        break;
-    case Qt::Key_A :
-        emulatorKeys[8] = 1;
-        break;
-    case Qt::Key_S :
-        emulatorKeys[9] = 1;
-        break;
-    case Qt::Key_D :
-        emulatorKeys[10] = 1;
-        break;
-    case Qt::Key_F :
-        emulatorKeys[11] = 1;
-        break;
-    case Qt::Key_Z :
-        emulatorKeys[12] = 1;
-        break;
-    case Qt::Key_X :
-        emulatorKeys[13] = 1;
-        break;
-    case Qt::Key_C :
-        emulatorKeys[14] = 1;
-        break;
-    case Qt::Key_V :
-        emulatorKeys[14] = 1;
-        break;
-    }
-
+    if (key->key() == Qt::Key_1)
+        emulator.keys[0] = 1;
+    if (key->key() == Qt::Key_2)
+        emulator.keys[1] = 1;
+    if (key->key() == Qt::Key_3)
+        emulator.keys[2] = 1;
+    if (key->key() == Qt::Key_4)
+        emulator.keys[3] = 1;
+    if (key->key() == Qt::Key_Q)
+        emulator.keys[4] = 1;
+    if (key->key() == Qt::Key_W)
+        emulator.keys[5] = 1;
+    if (key->key() == Qt::Key_E)
+        emulator.keys[6] = 1;
+    if (key->key() == Qt::Key_R)
+        emulator.keys[7] = 1;
+    if (key->key() == Qt::Key_A)
+        emulator.keys[8] = 1;
+    if (key->key() == Qt::Key_S)
+        emulator.keys[9] = 1;
+    if (key->key() == Qt::Key_D)
+        emulator.keys[10] = 1;
+    if (key->key() == Qt::Key_F)
+        emulator.keys[11] = 1;
+    if (key->key() == Qt::Key_Z)
+        emulator.keys[12] = 1;
+    if (key->key() == Qt::Key_X)
+        emulator.keys[13] = 1;
+    if (key->key() == Qt::Key_C)
+        emulator.keys[14] = 1;
+    if (key->key() == Qt::Key_V)
+        emulator.keys[15] = 1;
 }
 
 void Game::paint() {
@@ -137,5 +118,10 @@ void Game::paint() {
             }
         }
     }
+
+}
+
+
+void Game::resetgame() {
 
 }
