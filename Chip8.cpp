@@ -332,7 +332,7 @@ void Chip8::emulateCycle() {
                 auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
                 for (auto it = registers.cbegin(); it != endRegister; it++) {
                        auto pos = std::distance(registers.cbegin(), it);
-                        registers.at(static_cast<std::size_t>(pos)) = memory.at(indexRegister++);
+                       registers.at(static_cast<std::size_t>(pos)) = memory.at(indexRegister++);
                 }
                 programCounter += 2;
                 break;

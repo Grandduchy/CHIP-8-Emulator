@@ -22,6 +22,7 @@ protected:
     void paintEvent(QPaintEvent*) override;
     void timerEvent(QTimerEvent*) override;
     void paint();
+    void keyPressEvent(QKeyEvent* key) override;
 
 private slots:
     void runGame(const QString&);

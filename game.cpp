@@ -5,6 +5,7 @@
 #include <QPainter>
 #include <thread>
 #include <QTextStream>
+#include <QKeyEvent>
 
 
 Game::Game(QWidget *parent) :
@@ -56,6 +57,62 @@ void Game::runGame(const QString& fileName) {
 }
 
 void Game::resetgame() {
+
+}
+
+
+void Game::keyPressEvent(QKeyEvent* key) {
+    std::array<uint8_t, 16>& emulatorKeys = emulator.keys;
+    switch(key->key()) {
+    case Qt::Key_1 :
+        emulatorKeys.at(0) = 1;
+        break;
+    case Qt::Key_2 :
+        emulatorKeys.at(1) = 1;
+        break;
+    case Qt::Key_3 :
+        emulatorKeys.at(2) = 1;
+        break;
+    case Qt::Key_4 :
+        emulatorKeys.at(3) = 1;
+        break;
+    case Qt::Key_Q :
+        emulatorKeys.at(4) = 1;
+        break;
+    case Qt::Key_W :
+        emulatorKeys[5] = 1;
+        break;
+    case Qt::Key_E :
+        emulatorKeys[6] = 1;
+        break;
+    case Qt::Key_R :
+        emulatorKeys[7] = 1;
+        break;
+    case Qt::Key_A :
+        emulatorKeys[8] = 1;
+        break;
+    case Qt::Key_S :
+        emulatorKeys[9] = 1;
+        break;
+    case Qt::Key_D :
+        emulatorKeys[10] = 1;
+        break;
+    case Qt::Key_F :
+        emulatorKeys[11] = 1;
+        break;
+    case Qt::Key_Z :
+        emulatorKeys[12] = 1;
+        break;
+    case Qt::Key_X :
+        emulatorKeys[13] = 1;
+        break;
+    case Qt::Key_C :
+        emulatorKeys[14] = 1;
+        break;
+    case Qt::Key_V :
+        emulatorKeys[14] = 1;
+        break;
+    }
 
 }
 
