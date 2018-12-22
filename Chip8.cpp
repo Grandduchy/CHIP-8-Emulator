@@ -68,7 +68,7 @@ void Chip8::emulateCycle() {
     case 0x0000:
         switch(opcode & 0x00FF) {
             case 0x00E0 : // 00E0 : clear screen
-                for (auto obj : pixels) {
+                for (auto& obj : pixels) {
                     std::fill(obj.begin(), obj.end(), 0);
                 }
                 drawFlag = true;
