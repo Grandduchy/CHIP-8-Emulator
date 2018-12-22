@@ -23,12 +23,13 @@ protected:
     void timerEvent(QTimerEvent*) override;
     void paint();
     void keyPressEvent(QKeyEvent* key) override;
+    void keyReleaseEvent(QKeyEvent* key) override;
 
 private slots:
     void runGame(const QString&);
 private:
     void runCycle();
-    void resetKeys();
+    void setKey(QKeyEvent*& key, const uint8_t& setTo);
     Ui::Game *ui;
     QTimer* timer;
     QString filepath;

@@ -18,6 +18,7 @@
 //            : 0xFFF - End of CHIP-8 Ram
 
 
+
 class Chip8 {
     friend class Game;
 public:

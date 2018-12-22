@@ -14,9 +14,7 @@ Game::Game(QWidget *parent) :
     this->timer = new QTimer(this);
     setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
     connect(timer, &QTimer::timeout, this, &Game::runCycle);
-    timer->start(0);
-
-
+    timer->start(1);
     emulator.initalize();
 }
 
@@ -44,12 +42,10 @@ void Game::timerEvent(QTimerEvent *) {
 
 void Game::runCycle() {
     emulator.emulateCycle();
-    resetKeys();
     if (emulator.isDrawFlag()) {
         repaint();
         emulator.removeDrawFlag();
     }
-
 }
 
 
@@ -57,44 +53,48 @@ void Game::runGame(const QString& fileName) {
     Q_UNUSED(fileName);
 }
 
-void Game::resetKeys() {
-    std::fill(emulator.keys.begin(), emulator.keys.end(), 0);
-}
-
 
 void Game::keyPressEvent(QKeyEvent* key) {
+    setKey(key, 1);
+}
+
+void Game::keyReleaseEvent(QKeyEvent* key) {
+    setKey(key, 0);
+}
+
+void Game::setKey(QKeyEvent*& key, const uint8_t& setTo) {
     if (key->key() == Qt::Key_1)
-        emulator.keys[0] = 1;
+        emulator.keys[1] = setTo;
     if (key->key() == Qt::Key_2)
-        emulator.keys[1] = 1;
+        emulator.keys[2] = setTo;
     if (key->key() == Qt::Key_3)
-        emulator.keys[2] = 1;
+        emulator.keys[3] = setTo;
     if (key->key() == Qt::Key_4)
-        emulator.keys[3] = 1;
+        emulator.keys[0xC] = setTo;
     if (key->key() == Qt::Key_Q)
-        emulator.keys[4] = 1;
+        emulator.keys[4] = setTo;
     if (key->key() == Qt::Key_W)
-        emulator.keys[5] = 1;
+        emulator.keys[5] = setTo;
     if (key->key() == Qt::Key_E)
-        emulator.keys[6] = 1;
+        emulator.keys[6] = setTo;
     if (key->key() == Qt::Key_R)
-        emulator.keys[7] = 1;
+        emulator.keys[0xD] = setTo;
     if (key->key() == Qt::Key_A)
-        emulator.keys[8] = 1;
+        emulator.keys[7] = setTo;
     if (key->key() == Qt::Key_S)
-        emulator.keys[9] = 1;
+        emulator.keys[8] = setTo;
     if (key->key() == Qt::Key_D)
-        emulator.keys[10] = 1;
+        emulator.keys[9] = setTo;
     if (key->key() == Qt::Key_F)
-        emulator.keys[11] = 1;
+        emulator.keys[0xE] = setTo;
     if (key->key() == Qt::Key_Z)
-        emulator.keys[12] = 1;
+        emulator.keys[0xA] = setTo;
     if (key->key() == Qt::Key_X)
-        emulator.keys[13] = 1;
+        emulator.keys[0] = setTo;
     if (key->key() == Qt::Key_C)
-        emulator.keys[14] = 1;
+        emulator.keys[0xB] = setTo;
     if (key->key() == Qt::Key_V)
-        emulator.keys[15] = 1;
+        emulator.keys[0xF] = setTo;
 }
 
 void Game::paint() {

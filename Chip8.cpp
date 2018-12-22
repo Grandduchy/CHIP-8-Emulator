@@ -258,9 +258,6 @@ void Chip8::emulateCycle() {
     case 0xE000:
         switch(opcode & 0x00FF) {
             case 0x009E : {// EX9E : skip if key stored in VX is turned on
-                // this should be changed in the future if its really a boolean condition for keys
-                // since currently its an integer.
-
                 bool isOn = keys.at(registers.at((opcode & 0x0F00) >> 8)) == 1;
                 programCounter += isOn ? 4 : 2;
                 break;
