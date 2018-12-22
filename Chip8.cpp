@@ -136,7 +136,7 @@ void Chip8::emulateCycle() {
                 programCounter += 2;
                 break;
             case 0x0003 :  // 8XY3 : set VX to binary XOR with VX and VY
-                registers.at((opcode & 0x0F00) >> 8) |= registers.at((opcode & 0x00F0) >> 4);
+                registers.at((opcode & 0x0F00) >> 8) ^= registers.at((opcode & 0x00F0) >> 4);
                 programCounter += 2;
                 break;
             case 0x0004 : {// 8XY4 : add VY to VX
