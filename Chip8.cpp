@@ -67,19 +67,19 @@ void Chip8::emulateCycle() {
     switch(opcode & 0xF000) { // get the leftmost bit
     case 0x0000:
         switch(opcode & 0x00FF) {
-            case 0x00E0 : // 00E0 : clear screen
-                for (auto& obj : pixels) {
-                    std::fill(obj.begin(), obj.end(), 0);
-                }
-                drawFlag = true;
-                programCounter += 2;
+        case 0x00E0 : // 00E0 : clear screen
+            for (auto& obj : pixels) {
+                std::fill(obj.begin(), obj.end(), 0);
+            }
+            drawFlag = true;
+            programCounter += 2;
             break;
-            case 0x00EE : // 00EE : return from subroutine
-                programCounter = stack[--stackPointer];
-                programCounter += 2;
+        case 0x00EE : // 00EE : return from subroutine
+            programCounter = stack[--stackPointer];
+            programCounter += 2;
             break;
-            default :
-                std::cerr << "Unsupported 0xNNN opcode recieved : " << opcode << "\n";
+        default :
+            std::cerr << "Unsupported 0xNNN opcode recieved : " << opcode << "\n";
             break;
         }
         break;
@@ -123,80 +123,80 @@ void Chip8::emulateCycle() {
         break;
     case 0x8000:
         switch(opcode & 0x000F) {
-            case 0x0000 : // 8XY0 : set VX to VY
-                registers.at((opcode & 0x0F00) >> 8) = registers.at((opcode & 0x00F0) >> 4);
-                programCounter += 2;
-                break;
-            case 0x0001 :  // 8XY1 : set VX to binary OR with VX and VY
-                registers.at((opcode & 0x0F00) >> 8) |= registers.at((opcode & 0x00F0) >> 4);
-                programCounter += 2;
-                break;
-            case 0x0002 :  // 8XY2 : set VX to binary AND with VX and VY
-                registers.at((opcode & 0x0F00) >> 8) &= registers.at((opcode & 0x00F0) >> 4);
-                programCounter += 2;
-                break;
-            case 0x0003 :  // 8XY3 : set VX to binary XOR with VX and VY
-                registers.at((opcode & 0x0F00) >> 8) ^= registers.at((opcode & 0x00F0) >> 4);
-                programCounter += 2;
-                break;
-            case 0x0004 : {// 8XY4 : add VY to VX
-                uint16_t sum = registers.at((opcode & 0x0F00) >> 8) + registers.at((opcode & 0x00F0) >> 4);
-                std::get<0xF>(registers) = sum > std::numeric_limits<uint8_t>::max() ? 1 : 0; // calculate the carry
+        case 0x0000 : // 8XY0 : set VX to VY
+            registers.at((opcode & 0x0F00) >> 8) = registers.at((opcode & 0x00F0) >> 4);
+            programCounter += 2;
+            break;
+        case 0x0001 :  // 8XY1 : set VX to binary OR with VX and VY
+            registers.at((opcode & 0x0F00) >> 8) |= registers.at((opcode & 0x00F0) >> 4);
+            programCounter += 2;
+            break;
+        case 0x0002 :  // 8XY2 : set VX to binary AND with VX and VY
+            registers.at((opcode & 0x0F00) >> 8) &= registers.at((opcode & 0x00F0) >> 4);
+            programCounter += 2;
+            break;
+        case 0x0003 :  // 8XY3 : set VX to binary XOR with VX and VY
+            registers.at((opcode & 0x0F00) >> 8) ^= registers.at((opcode & 0x00F0) >> 4);
+            programCounter += 2;
+            break;
+        case 0x0004 : {// 8XY4 : add VY to VX
+            uint16_t sum = registers.at((opcode & 0x0F00) >> 8) + registers.at((opcode & 0x00F0) >> 4);
+            std::get<0xF>(registers) = sum > std::numeric_limits<uint8_t>::max() ? 1 : 0; // calculate the carry
 
-                registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
-                programCounter += 2;
-                break;
-            }
-            case 0x0005 :  {// 8XY5 : subtract VY from VX and set to VX
-                int16_t sum = registers.at((opcode & 0x0F00) >> 8) - registers.at((opcode & 0x00F0) >> 4);
-                std::get<0xF>(registers) = 1;
-                if (sum <= -1) { // we need to borrow from VF
-                    if (std::get<0xF>(registers) == 1) {// Can borrow
-                        std::get<0xF>(registers) = 0;
-                        registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
-                    }
-                    else { // Can't borrow
-                        registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
-                    }
+            registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
+            programCounter += 2;
+            break;
+        }
+        case 0x0005 :  {// 8XY5 : subtract VY from VX and set to VX
+            int16_t sum = registers.at((opcode & 0x0F00) >> 8) - registers.at((opcode & 0x00F0) >> 4);
+            std::get<0xF>(registers) = 1;
+            if (sum <= -1) { // we need to borrow from VF
+                if (std::get<0xF>(registers) == 1) {// Can borrow
+                    std::get<0xF>(registers) = 0;
+                    registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
                 }
-                else {
-
+                else { // Can't borrow
                     registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
                 }
-                programCounter += 2;
-                break;
             }
-            case 0x0006 : // 8XY6 : right shift VY by one and store in VX
-                std::get<0xF>(registers) = registers.at((opcode & 0x00F0) >> 4) & 1; // store the least significant bit of VY in VF
-                registers.at((opcode & 0x0F00) >> 8) = registers.at((opcode & 0x00F0) >> 4 ) >> 1;
-                programCounter +=2;
-                break;
-            case 0x0007 : {// 8XY7 : subtract VX from VY and set to VX
-                int16_t sum = registers.at((opcode & 0x00F0) >> 4) - registers.at((opcode & 0x0F00) >> 8);
-                std::get<0xF>(registers) = 1;
-                if (sum <= -1) {
-                    if (std::get<0xF>(registers) == 1) {
-                        std::get<0xF>(registers) = 0;
-                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
-                    }
-                    else {
-                        registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
-                    }
+            else {
+
+                registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
+            }
+            programCounter += 2;
+            break;
+        }
+        case 0x0006 : // 8XY6 : right shift VY by one and store in VX
+            std::get<0xF>(registers) = registers.at((opcode & 0x00F0) >> 4) & 1; // store the least significant bit of VY in VF
+            registers.at((opcode & 0x0F00) >> 8) = registers.at((opcode & 0x00F0) >> 4 ) >> 1;
+            programCounter +=2;
+            break;
+        case 0x0007 : {// 8XY7 : subtract VX from VY and set to VX
+            int16_t sum = registers.at((opcode & 0x00F0) >> 4) - registers.at((opcode & 0x0F00) >> 8);
+            std::get<0xF>(registers) = 1;
+            if (sum <= -1) {
+                if (std::get<0xF>(registers) == 1) {
+                    std::get<0xF>(registers) = 0;
+                    registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
                 }
                 else {
                     registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
                 }
-
-                programCounter += 2;
-                break;
             }
-            case 0x000E :// 8XYE : left shift VY by one and store in VX
-                std::get<0xF>(registers) = (registers.at((opcode & 0x00F0) >> 4) & (1 << 8)) >> 8; // store the greatest significant bit of VY in VF
-                registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(1 << registers.at((opcode & 0x00F0) >> 4));
-                programCounter += 2;
-                break;
-            default:
-                std::cerr << "Unkown opcode, expected 0x8XY(1-7,E) recieved : " << opcode << "\n";
+            else {
+                registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
+            }
+
+            programCounter += 2;
+            break;
+        }
+        case 0x000E :// 8XYE : left shift VY by one and store in VX
+            std::get<0xF>(registers) = (registers.at((opcode & 0x00F0) >> 4) & (1 << 8)) >> 8; // store the greatest significant bit of VY in VF
+            registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(1 << registers.at((opcode & 0x00F0) >> 4));
+            programCounter += 2;
+            break;
+        default:
+            std::cerr << "Unkown opcode, expected 0x8XY(1-7,E) recieved : " << opcode << "\n";
         }
 
         break;
@@ -257,86 +257,86 @@ void Chip8::emulateCycle() {
     }
     case 0xE000:
         switch(opcode & 0x00FF) {
-            case 0x009E : {// EX9E : skip if key stored in VX is turned on
-                bool isOn = keys.at(registers.at((opcode & 0x0F00) >> 8)) == 1;
-                programCounter += isOn ? 4 : 2;
-                break;
-            }
-            case 0x00A1 : {// EXA1 : skip if key stored in VX isn't pressed
-                 bool isOn = keys.at(registers.at((opcode & 0x0F00) >> 8)) == 1;
-                 programCounter += isOn ? 2 : 4;
-                 break;
-            }
-            default :
+        case 0x009E : {// EX9E : skip if key stored in VX is turned on
+            bool isOn = keys.at(registers.at((opcode & 0x0F00) >> 8)) == 1;
+            programCounter += isOn ? 4 : 2;
+            break;
+        }
+        case 0x00A1 : {// EXA1 : skip if key stored in VX isn't pressed
+            bool isOn = keys.at(registers.at((opcode & 0x0F00) >> 8)) == 1;
+            programCounter += isOn ? 2 : 4;
+            break;
+        }
+        default :
             std::cerr << "Unkown opcode, expected 0xEX(9E, A1) recieved : " << opcode << "\n";
         }
 
         break;
     case 0xF000:
         switch(opcode & 0x00FF) {
-            case 0x0007 : // FX07 : Set VX to the delay timer
-                registers.at((opcode & 0x0F00) >> 8) = delayTimer;
-                programCounter += 2;
-                break;
-            case 0x000A : {// FX0A : wait until a key is pressed and store to VX
-                auto it = std::find_if_not(keys.cbegin(), keys.cend(), [](const uint8_t& i) {
-                    return i == 0;
-                });
-                if (it != keys.end()) {
-                    registers.at( (opcode & 0x0F00) >> 8) = static_cast<uint8_t>(std::distance(keys.cbegin(), it));
-                    programCounter += 2;
-                }
-                break;
-            }
-            case 0x0015 : // FX15 : Set the delay timer to VX
-                delayTimer = registers.at((opcode & 0x0F00) >> 8);
-                programCounter += 2;
-                break;
-            case 0x0018 : // FX18 : Set the sound timer to VX
-                soundTimer = registers.at((opcode & 0x0F00) >> 8);
-                programCounter += 2;
-                break;
-            case 0x001E : {// FX1E : adds VX to I
-                if (indexRegister + registers.at((opcode & 0x0F00) >> 8) > 0xFFF)
-                    std::get<0xF>(registers) = 1;
-                else
-                    std::get<0xF>(registers) = 0;
-                indexRegister += registers.at((opcode & 0x0F00) >> 8);
+        case 0x0007 : // FX07 : Set VX to the delay timer
+            registers.at((opcode & 0x0F00) >> 8) = delayTimer;
+            programCounter += 2;
+            break;
+        case 0x000A : {// FX0A : wait until a key is pressed and store to VX
+            auto it = std::find_if_not(keys.cbegin(), keys.cend(), [](const uint8_t& i) {
+                return i == 0;
+            });
+            if (it != keys.end()) {
+                registers.at( (opcode & 0x0F00) >> 8) = static_cast<uint8_t>(std::distance(keys.cbegin(), it));
                 programCounter += 2;
             }
-                break;
-            case 0x0029 : {// FX29 : Set I to the sprite location for a character in VX
-                uint8_t character = registers.at((0x0F00 & opcode) >> 8);
-                indexRegister = character * 5;
-                programCounter += 2;
-                break;
+            break;
+        }
+        case 0x0015 : // FX15 : Set the delay timer to VX
+            delayTimer = registers.at((opcode & 0x0F00) >> 8);
+            programCounter += 2;
+            break;
+        case 0x0018 : // FX18 : Set the sound timer to VX
+            soundTimer = registers.at((opcode & 0x0F00) >> 8);
+            programCounter += 2;
+            break;
+        case 0x001E : {// FX1E : adds VX to I
+            if (indexRegister + registers.at((opcode & 0x0F00) >> 8) > 0xFFF)
+                std::get<0xF>(registers) = 1;
+            else
+                std::get<0xF>(registers) = 0;
+            indexRegister += registers.at((opcode & 0x0F00) >> 8);
+            programCounter += 2;
+        }
+            break;
+        case 0x0029 : {// FX29 : Set I to the sprite location for a character in VX
+            uint8_t character = registers.at((0x0F00 & opcode) >> 8);
+            indexRegister = character * 5;
+            programCounter += 2;
+            break;
+        }
+        case 0x0033 : // FX33 : Store the BCD of VX to I
+            memory.at(indexRegister) = registers.at((opcode & 0x0F00) >> 8) / 100;
+            memory.at(indexRegister + 1) = (registers.at((opcode & 0x0F00) >> 8) / 10) % 10;
+            memory.at(indexRegister + 2) = (registers.at((opcode & 0x0F00) >> 8) % 100) % 10;
+            programCounter += 2;
+            break;
+        case 0x0055 : { // FX55 : Write registers into memory starting from V0 to (including) VX starting at I, I is incremented by 1.
+            auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
+            for (auto it = registers.cbegin(); it != endRegister; it++) {
+                auto pos = std::distance(registers.cbegin(), it);
+                memory.at(indexRegister++) = static_cast<uint8_t>(registers.at(static_cast<std::size_t>(pos)));
             }
-            case 0x0033 : // FX33 : Store the BCD of VX to I
-                memory.at(indexRegister) = registers.at((opcode & 0x0F00) >> 8) / 100;
-                memory.at(indexRegister + 1) = (registers.at((opcode & 0x0F00) >> 8) / 10) % 10;
-                memory.at(indexRegister + 2) = (registers.at((opcode & 0x0F00) >> 8) % 100) % 10;
-                programCounter += 2;
-                break;
-            case 0x0055 : { // FX55 : Write registers into memory starting from V0 to (including) VX starting at I, I is incremented by 1.
-                auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
-                for (auto it = registers.cbegin(); it != endRegister; it++) {
-                    auto pos = std::distance(registers.cbegin(), it);
-                    memory.at(indexRegister++) = static_cast<uint8_t>(registers.at(static_cast<std::size_t>(pos)));
-                }
-                programCounter += 2;
-                break;
+            programCounter += 2;
+            break;
+        }
+        case 0x0065 : {// FX65 Read registers
+            auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
+            for (auto it = registers.cbegin(); it != endRegister; it++) {
+                auto pos = std::distance(registers.cbegin(), it);
+                registers.at(static_cast<std::size_t>(pos)) = memory.at(indexRegister++);
             }
-            case 0x0065 : {// FX65 Read registers
-                auto endRegister = registers.cbegin() + ((0x0F00 & opcode) >> 8) + 1;
-                for (auto it = registers.cbegin(); it != endRegister; it++) {
-                       auto pos = std::distance(registers.cbegin(), it);
-                       registers.at(static_cast<std::size_t>(pos)) = memory.at(indexRegister++);
-                }
-                programCounter += 2;
-                break;
-            }
-            default :
-                std::cerr << "Unkown opcode, expected 0xFN(07,0A,15,18,1E,29,33,55,65) recieved : " << opcode << "\n";
+            programCounter += 2;
+            break;
+        }
+        default :
+            std::cerr << "Unkown opcode, expected 0xFN(07,0A,15,18,1E,29,33,55,65) recieved : " << opcode << "\n";
         }
 
         break;

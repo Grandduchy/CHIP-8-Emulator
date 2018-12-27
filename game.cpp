@@ -14,7 +14,7 @@ Game::Game(QWidget *parent) :
     this->timer = new QTimer(this);
     setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
     connect(timer, &QTimer::timeout, this, &Game::runCycle);
-    timer->start(0);
+    timer->start(2);
     emulator.initalize();
 }
 
