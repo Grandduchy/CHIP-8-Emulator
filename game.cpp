@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include <QKeyEvent>
 #include <QMediaPlayer>
+#include <QTemporaryDir>
 
 
 Game::Game(QWidget *parent) :
@@ -19,7 +20,7 @@ Game::Game(QWidget *parent) :
     emulator.initalize();
 
     player = new QMediaPlayer();
-    player->setMedia(QUrl::fromLocalFile("/home/challenger/Development/CHIP-8-Emulator/beep.wav"));
+    player->setMedia(QUrl("qrc:/Audio/Audio/beep.wav"));
     player->setVolume(100);
 
 }
@@ -30,8 +31,24 @@ Game::~Game() {
 
 void Game::setFile(const QString& file) {
     this->filepath = file;
+    // Std file streams cannot use resources from QT
+    // Instead copy the resource into a temporary directory and load it from there
     try {
-        emulator.loadGame(file.toStdString());
+        QTemporaryDir tempDir;
+        QString tempFile;
+        if (tempDir.isValid())
+            tempFile = tempDir.path() + "/TEMPROM";
+        else
+            throw std::runtime_error("Temporary directory cannot be created to read file from resources");
+
+        if (!QFile::copy(file, tempFile))
+            throw std::runtime_error("Unable to copy resource file into temporary");
+
+        QFileInfo file(tempFile);
+        if (file.exists())
+            emulator.loadGame(file.absoluteFilePath().toStdString());
+        else
+            throw std::runtime_error("Unable to verify resources or unable to verify correct file to load game");
     } catch(const std::exception& e) {
         std::cerr << "Error loading game into emulator, Error : " << e.what() << std::endl;
     }
@@ -48,6 +65,7 @@ void Game::timerEvent(QTimerEvent *) {
 
 void Game::runCycle() {
     emulator.emulateCycle();
+
     if (emulator.isDrawFlag()) {
         repaint();
         emulator.removeDrawFlag();

@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/ROMs">
+        <file>ROMs/PONG</file>
+        <file>ROMs/INVADERS</file>
+        <file>ROMs/UFO</file>
+        <file>ROMs/TETRIS</file>
+    </qresource>
+    <qresource prefix="/Audio">
+        <file>Audio/beep.wav</file>
+    </qresource>
+</RCC>
