@@ -357,8 +357,3 @@ bool Chip8::isSoundFlag() const noexcept {
 void Chip8::removeSoundFlag() noexcept {
     soundFlag = false;
 }
-
-// Pressing or releasing keys is set to the keypad
-void Chip8::setKeys() {
-
-}

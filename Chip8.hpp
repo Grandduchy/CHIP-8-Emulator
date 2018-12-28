@@ -33,8 +33,6 @@ public:
 
     bool isDrawFlag() const noexcept;
 
-    void setKeys();
-
     void removeDrawFlag() noexcept;
 
     bool isSoundFlag() const noexcept;
