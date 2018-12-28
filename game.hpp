@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTimer>
 #include <Chip8.hpp>
+#include <QMediaPlayer>
 
 namespace Ui {
 class Game;
@@ -33,6 +34,7 @@ private:
     Ui::Game *ui;
     QTimer* timer;
     QString filepath;
+    QMediaPlayer* player;
     Chip8 emulator;
 };
 

@@ -6,7 +6,7 @@ int main(int argc, char *argv[]) {
     //MainWindow w;
     //w.show();
     Game game;
-    game.setFile("/home/challenger/Development/CHIP-8-Emulator/INVADERS");
+    game.setFile("/home/challenger/Development/CHIP-8-Emulator/PONG");
     game.show();
     return a.exec();
 }

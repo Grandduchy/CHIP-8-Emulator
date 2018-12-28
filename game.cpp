@@ -6,16 +6,22 @@
 #include <thread>
 #include <QTextStream>
 #include <QKeyEvent>
+#include <QMediaPlayer>
 
 
 Game::Game(QWidget *parent) :
-    QWidget(parent), ui(new Ui::Game) {
+    QWidget(parent), ui(new Ui::Game){
     ui->setupUi(this);
     this->timer = new QTimer(this);
     setFixedSize(QSize(WIDTH * 10, HEIGHT * 10));
     connect(timer, &QTimer::timeout, this, &Game::runCycle);
-    timer->start(2);
+    timer->start(1);
     emulator.initalize();
+
+    player = new QMediaPlayer();
+    player->setMedia(QUrl::fromLocalFile("/home/challenger/Development/CHIP-8-Emulator/beep.wav"));
+    player->setVolume(100);
+
 }
 
 Game::~Game() {
@@ -45,6 +51,10 @@ void Game::runCycle() {
     if (emulator.isDrawFlag()) {
         repaint();
         emulator.removeDrawFlag();
+    }
+    if (emulator.isSoundFlag()) {
+        player->play();
+        emulator.removeSoundFlag();
     }
 }
 

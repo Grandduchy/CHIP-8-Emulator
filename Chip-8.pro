@@ -1,7 +1,8 @@
 TEMPLATE = app
 TARGET = Chip-8
 
-QT       += core gui
+QT       += core gui \
+            multimedia
 
 CONFIG += c++14
 

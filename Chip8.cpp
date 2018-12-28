@@ -332,7 +332,7 @@ void Chip8::updateTimers() noexcept {
 
     if (soundTimer > 0) {
         if (soundTimer == 1)
-            std::cout << "BEEP!\n";
+            this->soundFlag = true;
 
         --soundTimer;
     }
@@ -348,6 +348,14 @@ uint8_t Chip8::getRand8Bit() {
 // Determines if it needs to draw the screen
 bool Chip8::isDrawFlag() const noexcept {
     return drawFlag;
+}
+
+bool Chip8::isSoundFlag() const noexcept {
+    return soundFlag;
+}
+
+void Chip8::removeSoundFlag() noexcept {
+    soundFlag = false;
 }
 
 // Pressing or releasing keys is set to the keypad

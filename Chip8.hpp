@@ -37,6 +37,10 @@ public:
 
     void removeDrawFlag() noexcept;
 
+    bool isSoundFlag() const noexcept;
+
+    void removeSoundFlag() noexcept;
+
 private:
     uint16_t currentOpcode;
     std::array<uint8_t, 4096> memory{};
@@ -68,6 +72,9 @@ private:
 
     // determines if the program requests to draw
     bool drawFlag = false;
+
+    // determines if the program need to make a sound.S
+    bool soundFlag = false;
 
     // CHIP-8 Provides a fontset for programs to display 0-F characters called sprites
     // The program needs to know where the binary representation of the sprite is located
