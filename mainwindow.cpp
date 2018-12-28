@@ -13,6 +13,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(ui->fileButton, &QPushButton::pressed, this, &MainWindow::fileButtonPressed);
     connect(ui->playButton, &QPushButton::pressed, this, &MainWindow::playButtonPressed);
+    connect(ui->InvadersButton, &QPushButton::pressed, this, &MainWindow::preInstalledButton);
+    connect(ui->PongButton, &QPushButton::pressed, this, &MainWindow::preInstalledButton);
+    connect(ui->TetrisButton, &QPushButton::pressed, this, &MainWindow::preInstalledButton);
+    connect(ui->UFOButton, &QPushButton::pressed, this, &MainWindow::preInstalledButton);
 }
 
 MainWindow::~MainWindow() {
@@ -42,13 +46,32 @@ void MainWindow::playButtonPressed() {
 
         if (game == nullptr)
             game = new Game();
-        //game->setFile(fileName);
         game->resetgame();
         game->show();
+        game->setFile(fileName);
     }
     else {
         QMessageBox* box = new QMessageBox(this);
         box->setText("File does not exist or is not a file.");
         box->exec();
     }
+}
+
+void MainWindow::preInstalledButton() {
+    QString fName;
+    if (ui->InvadersButton->isDown())
+        fName = ":/ROMs/ROMs/INVADERS";
+    if (ui->PongButton->isDown())
+        fName = ":/ROMs/ROMs/PONG";
+    if (ui->TetrisButton->isDown())
+        fName = ":/ROMs/ROMs/TETRIS";
+    if (ui->UFOButton->isDown())
+        fName = ":/ROMs/ROMs/UFO";
+
+    if (game == nullptr)
+        game = new Game();
+    game->resetgame();
+    game->show();
+    game->setFile(fName);
+
 }

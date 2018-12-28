@@ -18,6 +18,7 @@ public:
 private slots:
     void fileButtonPressed();
     void playButtonPressed();
+    void preInstalledButton();
 private:
     Ui::MainWindow *ui;
     Game* game;
