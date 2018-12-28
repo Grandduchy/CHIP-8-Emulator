@@ -151,5 +151,5 @@ void Game::paint() {
 
 
 void Game::resetgame() {
-
+    emulator.initalize();
 }

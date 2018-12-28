@@ -27,6 +27,11 @@ void Chip8::initalize() {
     std::fill(stack.begin(), stack.end(), 0);
     std::fill(keys.begin(), keys.end(), 0);
 
+
+    std::for_each(pixels.begin(), pixels.end(), [](std::array<uint8_t, WIDTH>& yLine){
+        std::fill(yLine.begin(), yLine.end(), 0);
+    });
+
     // load the fontset
     for (int i = 0; i < 80; i++)
         memory[static_cast<std::size_t>(i)] = fontset[i];
