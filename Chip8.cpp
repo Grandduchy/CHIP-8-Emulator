@@ -149,50 +149,27 @@ void Chip8::emulateCycle() {
         }
         case 0x0005 :  {// 8XY5 : subtract VY from VX and set to VX
             int16_t sum = registers.at((opcode & 0x0F00) >> 8) - registers.at((opcode & 0x00F0) >> 4);
-            std::get<0xF>(registers) = 1;
-            if (sum <= -1) { // we need to borrow from VF
-                if (std::get<0xF>(registers) == 1) {// Can borrow
-                    std::get<0xF>(registers) = 0;
-                    registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
-                }
-                else { // Can't borrow
-                    registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
-                }
-            }
-            else {
-
-                registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
-            }
+            std::get<0xF>(registers) = sum <= -1 ? 0 : 1;
+            registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(sum);
             programCounter += 2;
             break;
         }
-        case 0x0006 : // 8XY6 : right shift VY by one and store in VX
-            std::get<0xF>(registers) = registers.at((opcode & 0x00F0) >> 4) & 1; // store the least significant bit of VY in VF
-            registers.at((opcode & 0x0F00) >> 8) = registers.at((opcode & 0x00F0) >> 4 ) >> 1;
+        case 0x0006 : // 8XY6 : Store the least significant bit of VX in VF and then shifts VX to the right by 1
+            std::get<0xF>(registers) = registers.at((opcode & 0x0F00) >> 8) & 1; // store the least significant bit of VY in VF
+            registers.at((opcode & 0x0F00) >> 8) >>= 1;
             programCounter +=2;
             break;
         case 0x0007 : {// 8XY7 : subtract VX from VY and set to VX
             int16_t sum = registers.at((opcode & 0x00F0) >> 4) - registers.at((opcode & 0x0F00) >> 8);
-            std::get<0xF>(registers) = 1;
-            if (sum <= -1) {
-                if (std::get<0xF>(registers) == 1) {
-                    std::get<0xF>(registers) = 0;
-                    registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum + std::numeric_limits<uint8_t>::max());
-                }
-                else {
-                    registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
-                }
-            }
-            else {
-                registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
-            }
+            std::get<0xF>(registers) = sum <= -1 ? 0 : 1; // set VF to 0 if there is a borrow
+            registers.at((registers.at((opcode & 0x0F00) >> 8))) = static_cast<uint8_t>(sum);
 
             programCounter += 2;
             break;
         }
-        case 0x000E :// 8XYE : left shift VY by one and store in VX
-            std::get<0xF>(registers) = (registers.at((opcode & 0x00F0) >> 4) & (1 << 8)) >> 8; // store the greatest significant bit of VY in VF
-            registers.at((opcode & 0x0F00) >> 8) = static_cast<uint8_t>(1 << registers.at((opcode & 0x00F0) >> 4));
+        case 0x000E :// 8XYE : Store the most significant bit of VX in VF and then shifts VX to the left by 1.
+            std::get<0xF>(registers) = registers.at((opcode & 0x0F00) >> 8) >> 7;
+            registers.at((opcode & 0x0F00) >> 8) <<= 1;
             programCounter += 2;
             break;
         default:
