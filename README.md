@@ -13,7 +13,7 @@ Alternatively Qt can be installed through an installer [here](https://www.qt.io/
 # Quick Start
 First clone this repository
 ```
- git clone https://github.com/Grandduchy/Simple-Reddit-for-C-plus-plus
+ git clone https://github.com/Grandduchy/CHIP-8-Emulator
 ```
 Run configure
 ```
