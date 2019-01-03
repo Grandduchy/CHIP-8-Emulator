@@ -14,6 +14,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+QMAKE_CXXFLAGS += -std=c++14
+
 SOURCES += main.cpp \
     Chip8.cpp \
     mainwindow.cpp \

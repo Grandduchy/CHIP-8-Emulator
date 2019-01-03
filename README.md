@@ -1,5 +1,5 @@
 # CHIP-8-Emulator
-A simple CHIP-8 Emulator created in C++ <br />
+A simple CHIP-8 Emulator created in C++ &nbsp;&nbsp;&nbsp;&nbsp;[![Build Status](https://travis-ci.org/Grandduchy/CHIP-8-Emulator.svg?branch=master)](https://travis-ci.org/Grandduchy/CHIP-8-Emulator) <br />
 This program uses QT for the GUI and QT for compilation through qmake. <br />
 The emulator comes with the games UFO, Tetris, Space Invaders and Pong <br />
 
