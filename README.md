@@ -18,11 +18,11 @@ First clone this repository
 Run configure
 ```
 cd CHIP-8-Emulator
-./configure.sh
+./build.sh
 ```
 Incase you do not have permission, add executable permission by:
 ```
-chmod +x configure.sh
+chmod +x build.sh
 ```
 Configure creates the executable in build directory, to run the program
 ```
